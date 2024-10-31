@@ -224,7 +224,7 @@ string stringLine = "";
 int textColorIndex = 0;
 int bgndColorIndex = 0;//BGND_COLOR[0];
 
-WorldType World2D::worldType = WorldType::CYLINDER_WORLD;
+WorldType World2D::worldType = WorldType::WINDOW_WORLD;
 bool World2D::drawReferenceFrames = false;
 
 list<shared_ptr<GraphicObject2D> > objList;
@@ -274,7 +274,6 @@ void myDisplayFunc(void)
 	//--------------------------
 
 	for (auto obj : objList)
-		if (obj != nullptr)
 			obj->draw();
 		
 	switch(World2D::worldType)
@@ -386,7 +385,7 @@ void myMouseHandler(int button, int state, int ix, int iy)
 				bool clickedOnStuff = false;
 				for (auto obj : objList)
 				{
-					if (obj != nullptr && obj->isInside(wpt)) {
+					if (obj->isInside(wpt)) {
 						cout << "clicked on object (base: " << obj->getBaseIndex()
 							 << ", final class: " << obj->getIndex() << ")" << endl;
 						clickedOnStuff = true;
@@ -556,18 +555,32 @@ void myTimerFunc(int value)
 
 //		for (constObjIter iter = objList.begin(); iter != objList.end(); iter++)
 		for (objIter iter = objList.begin(); iter != objList.end(); iter++)
-		{
-			if (*iter != nullptr)
-			{
-				UpdateStatus status = (*iter)->update(dt);
 
-				//if (status == UpdateStatus::DEAD)
-				//{
-				//	//objList.erase(iter++);
-				//	*iter = nullptr;
-				//}
+		{
+
+			UpdateStatus status = (*iter)->update(dt);
+
+
+
+			if (status == UpdateStatus::DEAD)
+
+			{
+
+				//	If the list holds the sole shared pointer to the object
+
+				//	this will drop the number of references to 0 and the
+
+				//	object's destructor will be called.
+
+				*iter = nullptr;
+
 			}
+
 		}
+
+		//	And then we remove by value all null entries of the list
+
+		objList.remove(nullptr);
 	}
 	
 	//	And finally I perform the rendering
@@ -848,7 +861,6 @@ void applicationInit()
 		float speed = speedDist(myEngine);
 		float spin = spinDist(myEngine);
 		float r = colorDist(myEngine), g = colorDist(myEngine), b = colorDist(myEngine);
-		cout << "Object " << k << " at " << x << ", " << y << endl;
 		switch(shapeDist(myEngine))
 		{
 			case 0:

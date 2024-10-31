@@ -5,7 +5,6 @@
 //  Created by Jean-Yves Hervé on 2024-09-19.
 //
 
-#include <iostream> 
 #include "glPlatform.h"
 #include "GraphicObject2D.h"
 
@@ -39,7 +38,6 @@ GraphicObject2D::GraphicObject2D(float cx, float cy, float angle,
 		absoluteBox_(nullptr),
 		index_(count_++)
 {
-	cout << "\t In GO2D Object " << index_ << " at " << cx_ << ", " << cy_ << endl;
 	liveCount_++;
 }
 
@@ -115,25 +113,25 @@ UpdateStatus GraphicObject2D::update(float dt)
 
 		case WorldType::BOX_WORLD:
 			//	hit the right edge
-			if (getX() > World2D::X_MAX) {
+			if (getX() >= World2D::X_MAX) {
 				cx_ = World2D::X_MAX;
 				vx_ = -vx_;
 				status = UpdateStatus::BOUNCE;
 			}
 			//	hit the left edge
-			if (getX() < World2D::X_MIN) {
+			if (getX() <= World2D::X_MIN) {
 				cx_ = World2D::X_MIN;
 				vx_ = -vx_;
 				status = UpdateStatus::BOUNCE;
 			}
 			//	hit the top edge
-			if (getY() > World2D::Y_MAX) {
+			if (getY() >= World2D::Y_MAX) {
 				cy_ = World2D::Y_MAX;
 				vy_ = -vy_;
 				status = UpdateStatus::BOUNCE;
 			}
 			//	hit the bottom edge
-			if (getY() < World2D::Y_MIN) {
+			if (getY() <= World2D::Y_MIN) {
 				cy_ = World2D::Y_MIN;
 				vy_ = -vy_;
 				status = UpdateStatus::BOUNCE;
@@ -152,13 +150,13 @@ UpdateStatus GraphicObject2D::update(float dt)
 				status = UpdateStatus::WRAPAROUND;
 			}
 			//	hit the top edge
-			if (getY() > World2D::Y_MAX) {
+			if (getY() >= World2D::Y_MAX) {
 				cy_ = World2D::Y_MAX;
 				vy_ = -vy_;
 				status = UpdateStatus::BOUNCE;
 			}
 			//	hit the bottom edge
-			if (getY() < World2D::Y_MIN) {
+			if (getY() <= World2D::Y_MIN) {
 				cy_ = World2D::Y_MIN;
 				vy_ = -vy_;
 				status = UpdateStatus::BOUNCE;
@@ -188,8 +186,6 @@ void GraphicObject2D::draw() const
 	glTranslatef(cx_, cy_, 0.f);
 	glRotatef(angle_, 0, 0, 1);
 	
-	cout << "\t\t In GO2D draw Object " << index_ << " at " << cx_ << ", " << cy_ << endl;
-
 	//	call the object's private drawing function
 	draw_();
 	
