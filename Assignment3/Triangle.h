@@ -42,6 +42,7 @@ namespace earshooter
 			 */
 			void draw_() const override;
 
+			void updateRelativeBox_();
 			/** Update the object's absolute bounding box
 			 */
 			void updateAbsoluteBox_() override;
@@ -156,6 +157,7 @@ namespace earshooter
 			 *	@return	the number of Triangle2D objects still "alive"
 			 */
 			static unsigned int getLiveCount();
+			
 
 			//	Deleted constructors and operators
 			Triangle() = delete;

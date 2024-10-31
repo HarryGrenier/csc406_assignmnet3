@@ -32,6 +32,8 @@ Rectangle2D::Rectangle2D(float centerX, float centerY, float angle, float width,
 		height_(height),
 		index_(count_++)
 {
+	updateRelativeBox_();
+	updateAbsoluteBox_();
 	liveCount_++;
 }
 
@@ -119,10 +121,57 @@ bool Rectangle2D::isInside(float x, float y) const
 	return (fabsf(rdx) <= width_/2) && (fabsf(rdy) <= height_/2);
 }
 
+void Rectangle2D::updateRelativeBox_() {
+	// Half dimensions of the rectangle
+	float halfWidth = width_ / 2;
+	float halfHeight = height_ / 2;
+
+	// Set the relative bounding box using the local coordinates
+	setRelativeBoundingBox(-halfWidth, halfWidth, -halfHeight, halfHeight);
+}
 
 void Rectangle2D::updateAbsoluteBox_()
 {
+	// Center position and angle in radians
+	float cx = getX();
+	float cy = getY();
+	float radAngle = M_PI * getAngle() / 180.f;
+	float cosA = cosf(radAngle);
+	float sinA = sinf(radAngle);
 
+	// Half-dimensions
+	float halfWidth = width_ / 2;
+	float halfHeight = height_ / 2;
+
+	// Calculate rotated corner positions
+	float x1 = cx + (-halfWidth * cosA - -halfHeight * sinA);
+	float y1 = cy + (-halfWidth * sinA + -halfHeight * cosA);
+
+	float x2 = cx + (halfWidth * cosA - -halfHeight * sinA);
+	float y2 = cy + (halfWidth * sinA + -halfHeight * cosA);
+
+	float x3 = cx + (halfWidth * cosA - halfHeight * sinA);
+	float y3 = cy + (halfWidth * sinA + halfHeight * cosA);
+
+	float x4 = cx + (-halfWidth * cosA - halfHeight * sinA);
+	float y4 = cy + (-halfWidth * sinA + halfHeight * cosA);
+
+	// Find min and max x and y values for bounding box
+	float minX = x1, maxX = x1;
+	float minY = y1, maxY = y1;
+
+	// Compare with each corner
+	if (x2 < minX) minX = x2; if (x2 > maxX) maxX = x2;
+	if (y2 < minY) minY = y2; if (y2 > maxY) maxY = y2;
+
+	if (x3 < minX) minX = x3; if (x3 > maxX) maxX = x3;
+	if (y3 < minY) minY = y3; if (y3 > maxY) maxY = y3;
+
+	if (x4 < minX) minX = x4; if (x4 > maxX) maxX = x4;
+	if (y4 < minY) minY = y4; if (y4 > maxY) maxY = y4;
+
+	// Set the absolute bounding box with the calculated min and max
+	setAbsoluteBoundingBox(minX, maxX, minY, maxY);
 }
 
 

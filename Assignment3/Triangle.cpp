@@ -43,6 +43,8 @@ Triangle::Triangle(float cx, float cy, float angle, float radius, float r,
 		index_(count_++)
 {
 	liveCount_++;
+	updateRelativeBox_();
+	updateAbsoluteBox_();
 }
 
 Triangle::Triangle(float cx, float cy, float angle, float radius,
@@ -138,11 +140,68 @@ bool Triangle::isInside(float x, float y) const
 	return false;
 }
 
-void Triangle::updateAbsoluteBox_()
-{
+void Triangle::updateRelativeBox_() {
+	// Calculate relative bounding box based on triangle vertices in local coordinates
+	float minX = xy_[0][0] * radius_;
+	float maxX = xy_[0][0] * radius_;
+	float minY = xy_[0][1] * radius_;
+	float maxY = xy_[0][1] * radius_;
 
+	for (int i = 1; i < 3; ++i) {
+		float x = xy_[i][0] * radius_;
+		float y = xy_[i][1] * radius_;
+
+		if (x < minX) minX = x;
+		if (x > maxX) maxX = x;
+		if (y < minY) minY = y;
+		if (y > maxY) maxY = y;
+	}
+
+	// Set the relative bounding box
+	setRelativeBoundingBox(minX, maxX, minY, maxY);
 }
 
+void Triangle::updateAbsoluteBox_() {
+	// Retrieve the triangle's center position using the getX() and getY() methods
+	float cx = getX();
+	float cy = getY();
+
+	// Angle of the triangle in radians
+	float angle = M_PI * getAngle() / 180.f;
+	float cA = cosf(angle);
+	float sA = sinf(angle);
+
+	// Define the triangle vertices based on radius and angle
+	// Assuming radius defines the distance from the center to each vertex
+	float x1 = cx + (xy_[0][0] * cA - xy_[0][1] * sA) * radius_;
+	float y1 = cy + (xy_[0][0] * sA + xy_[0][1] * cA) * radius_;
+
+	float x2 = cx + (xy_[1][0] * cA - xy_[1][1] * sA) * radius_;
+	float y2 = cy + (xy_[1][0] * sA + xy_[1][1] * cA) * radius_;
+
+	float x3 = cx + (xy_[2][0] * cA - xy_[2][1] * sA) * radius_;
+	float y3 = cy + (xy_[2][0] * sA + xy_[2][1] * cA) * radius_;
+
+	// Calculate min and max for the bounding box
+	float minX = x1;
+	if (x2 < minX) minX = x2;
+	if (x3 < minX) minX = x3;
+
+	float maxX = x1;
+	if (x2 > maxX) maxX = x2;
+	if (x3 > maxX) maxX = x3;
+
+	float minY = y1;
+	if (y2 < minY) minY = y2;
+	if (y3 < minY) minY = y3;
+
+	float maxY = y1;
+	if (y2 > maxY) maxY = y2;
+	if (y3 > maxY) maxY = y3;
+
+	// Set the absolute bounding box using the calculated min and max values
+	setAbsoluteBoundingBox(minX, maxX, minY, maxY);
+}
 #if 0
 //--------------------------------------
 #pragma mark -

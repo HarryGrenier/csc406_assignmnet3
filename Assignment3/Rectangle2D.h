@@ -36,7 +36,7 @@ namespace earshooter
 			 *	scaling prior to rendering.
 			 */
 			void draw_() const override;
-
+			void updateRelativeBox_();
 			/** Update the object's absolute bounding box
 			 */
 			void updateAbsoluteBox_() override;
