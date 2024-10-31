@@ -1,0 +1,7 @@
+﻿  prog01.cpp
+C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\Assignment3\prog01.cpp(320,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\Assignment3\prog01.cpp(380,36): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\Assignment3\prog01.cpp(380,32): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\Assignment3\prog01.cpp(721,28): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\Assignment3\prog01.cpp(725,31): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+  Assignment3.vcxproj -> C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\bin\Debug-windows-x86_64\Assignment3\Assignment3.exe
