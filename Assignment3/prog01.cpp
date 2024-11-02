@@ -296,7 +296,48 @@ void myDisplayFunc(void)
 			glPopMatrix();
 		break;
 
+
 		case WorldType::SPHERE_WORLD:
+			glPushMatrix();
+			// Draw central (original) position
+			for (auto obj : objList)
+				obj->draw();
+
+			// Draw all eight surrounding copies
+
+			// Left and Right translations
+			glTranslatef(-World2D::WIDTH, 0.f, 0.f);
+			for (auto obj : objList)
+				obj->draw();
+			glTranslatef(2.f * World2D::WIDTH, 0.f, 0.f);
+			for (auto obj : objList)
+				obj->draw();
+			glTranslatef(-World2D::WIDTH, 0.f, 0.f); // reset to center
+
+			// Top and Bottom translations
+			glTranslatef(0.f, World2D::HEIGHT, 0.f);
+			for (auto obj : objList)
+				obj->draw();
+			glTranslatef(0.f, -2.f * World2D::HEIGHT, 0.f);
+			for (auto obj : objList)
+				obj->draw();
+			glTranslatef(0.f, World2D::HEIGHT, 0.f); // reset to center
+
+			// Top-Left, Top-Right, Bottom-Left, Bottom-Right translations
+			glTranslatef(-World2D::WIDTH, World2D::HEIGHT, 0.f);
+			for (auto obj : objList)
+				obj->draw();
+			glTranslatef(2.f * World2D::WIDTH, 0.f, 0.f);
+			for (auto obj : objList)
+				obj->draw();
+			glTranslatef(0.f, -2.f * World2D::HEIGHT, 0.f);
+			for (auto obj : objList)
+				obj->draw();
+			glTranslatef(-2.f * World2D::WIDTH, 0.f, 0.f);
+			for (auto obj : objList)
+				obj->draw();
+
+			glPopMatrix();
 		break;
 	
 		default:

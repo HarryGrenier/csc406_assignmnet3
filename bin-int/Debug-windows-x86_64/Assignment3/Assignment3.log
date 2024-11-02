@@ -1,14 +1,2 @@
-﻿  SmilingFace.cpp
-C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\Assignment3\SmilingFace.cpp(260,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\memory(3597,56): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\memory(3597,56): warning C4244:         with
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\memory(3597,56): warning C4244:         [
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\memory(3597,56): warning C4244:             _Ty=int
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\memory(3597,56): warning C4244:         ]
-  (compiling source file 'SmilingFace.cpp')
-      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\memory(3597,56):
-      the template instantiation context (the oldest one first) is
-          C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\Assignment3\SmilingFace.cpp(200,38):
-          see reference to function template instantiation 'std::unique_ptr<earshooter::BoundingBox,std::default_delete<earshooter::BoundingBox>> std::make_unique<earshooter::BoundingBox,int,int,int,int,earshooter::ColorIndex,0>(int &&,int &&,int &&,int &&,earshooter::ColorIndex &&)' being compiled
-  
+﻿  GraphicObject2D.cpp
   Assignment3.vcxproj -> C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\bin\Debug-windows-x86_64\Assignment3\Assignment3.exe

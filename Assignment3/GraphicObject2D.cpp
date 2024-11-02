@@ -164,7 +164,28 @@ UpdateStatus GraphicObject2D::update(float dt)
 		break;
 
 		case WorldType::SPHERE_WORLD:
-		break;
+			// hit the right edge
+			if (getX() >= World2D::X_MAX) {
+				cx_ -= World2D::WIDTH;
+				status = UpdateStatus::WRAPAROUND;
+			}
+			// hit the left edge
+			else if (getX() <= World2D::X_MIN) {
+				cx_ += World2D::WIDTH;
+				status = UpdateStatus::WRAPAROUND;
+			}
+
+			// hit the top edge
+			if (getY() >= World2D::Y_MAX) {
+				cy_ -= World2D::HEIGHT;  // Adjust cy_ to wrap vertically
+				status = UpdateStatus::WRAPAROUND;
+			}
+			// hit the bottom edge
+			else if (getY() <= World2D::Y_MIN) {
+				cy_ += World2D::HEIGHT;  // Adjust cy_ to wrap vertically
+				status = UpdateStatus::WRAPAROUND;
+			}
+			break;
 	
 		default:
 			break;
