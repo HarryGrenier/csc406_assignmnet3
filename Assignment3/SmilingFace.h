@@ -74,6 +74,7 @@ namespace earshooter
 			 */
 			std::vector<std::unique_ptr<BoundingBox> > partAbsoluteBox_;
 
+
 			/**	Initializes the relative boxes' dimensions
 			 */
 			void initializeRelativeBox_() const;
@@ -94,6 +95,7 @@ namespace earshooter
 
 
 		public:
+
 
 			/**	Creates a smiling SmilingFace object with the specified position,
 			 * velocity, scale, and color

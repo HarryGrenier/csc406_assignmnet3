@@ -1,3 +1,3 @@
 ﻿  SmilingFace.cpp
-C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\Assignment3\SmilingFace.cpp(193,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\Assignment3\SmilingFace.cpp(209,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Assignment3.vcxproj -> C:\Users\slowe\OneDrive\Desktop\CSC406\CSC406_assignment3\bin\Debug-windows-x86_64\Assignment3\Assignment3.exe

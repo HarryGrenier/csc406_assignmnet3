@@ -56,7 +56,6 @@ namespace earshooter
 			}
 
 		public:
-
 			/**	Creates a GraphicObject2D object with the specified position,
 			 * velocity, spin, and color
 			 * @PARAM x	x coordinates of the SmilingFace
