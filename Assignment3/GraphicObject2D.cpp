@@ -202,6 +202,26 @@ void GraphicObject2D::draw() const
 		glPopMatrix();
 	}
 	
+	if (BoundingBox::relativeBoxesAreDrawn() && !partRelativeBox_.empty()) {
+		for (const auto& box : partRelativeBox_) {
+			if (box) {
+				box->draw();
+			}
+		}
+	}
+	else if (BoundingBox::absoluteBoxesAreDrawn() && !partAbsoluteBox_.empty())
+	{
+		for (const auto& box : partAbsoluteBox_) {
+			if (box) {
+				glPushMatrix();
+				glLoadIdentity();
+
+				box->draw();
+				glPopMatrix();
+			}
+		}
+	}
+
 	if (World2D::drawReferenceFrames)
 		drawReferenceFrame();
 

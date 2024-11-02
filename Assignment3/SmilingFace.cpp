@@ -9,6 +9,7 @@
 #include "World2D.h"
 #include "SmilingFace.h"
 #include "Ellipse2D.h"
+#include <iostream>
 
 using namespace earshooter;
 using namespace std;
@@ -68,7 +69,10 @@ SmilingFace::SmilingFace(float x, float y, float angle, float size,
 		size_(size),
 		index_(count_++)
 {
+	updateRelativeBox_();
 	updateAbsoluteBox_();
+	
+
 	liveCount_++;
 }
 
@@ -174,8 +178,13 @@ void SmilingFace::draw_(void) const
 	drawArc(0.7f, 0.85f);
 	glLineWidth(1.f);
 
+
+
+	
+
 	//	restore the original scale
 	glPopMatrix();
+
 }
 
 bool SmilingFace::isInside(float x, float y) const
@@ -185,97 +194,130 @@ bool SmilingFace::isInside(float x, float y) const
 	return inside;
 }
 
+void SmilingFace::updateRelativeBox_() {
+	// Initialize partRelativeBox_ if empty
+	if (partRelativeBox_.empty()) {
+		partRelativeBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::YELLOW)); // Face
+		partRelativeBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::YELLOW)); // Left Ear
+		partRelativeBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::YELLOW)); // Right Ear
+	}
+
+	float scale = size_;
+
+	// Relative bounding box for the face, centered at (0, 0)
+	float faceMinX = -FACE_RADIUS * scale;
+	float faceMaxX = FACE_RADIUS * scale;
+	float faceMinY = -FACE_RADIUS * scale;
+	float faceMaxY = FACE_RADIUS * scale;
+	partRelativeBox_[FACE]->setDimensions(faceMinX, faceMaxX, faceMinY, faceMaxY);
+
+	// Relative bounding box for the left ear, centered at (LEFT_EAR_X, LEFT_EAR_Y)
+	float leftEarCenterX = LEFT_EAR_X * scale;
+	float leftEarCenterY = LEFT_EAR_Y * scale;
+	float leftEarMinX = leftEarCenterX - EAR_RADIUS * scale;
+	float leftEarMaxX = leftEarCenterX + EAR_RADIUS * scale;
+	float leftEarMinY = leftEarCenterY - EAR_RADIUS * scale;
+	float leftEarMaxY = leftEarCenterY + EAR_RADIUS * scale;
+	partRelativeBox_[LEFT_EAR]->setDimensions(leftEarMinX, leftEarMaxX, leftEarMinY, leftEarMaxY);
+
+	// Relative bounding box for the right ear, centered at (RIGHT_EAR_X, RIGHT_EAR_Y)
+	float rightEarCenterX = RIGHT_EAR_X * scale;
+	float rightEarCenterY = RIGHT_EAR_Y * scale;
+	float rightEarMinX = rightEarCenterX - EAR_RADIUS * scale;
+	float rightEarMaxX = rightEarCenterX + EAR_RADIUS * scale;
+	float rightEarMinY = rightEarCenterY - EAR_RADIUS * scale;
+	float rightEarMaxY = rightEarCenterY + EAR_RADIUS * scale;
+	partRelativeBox_[RIGHT_EAR]->setDimensions(rightEarMinX, rightEarMaxX, rightEarMinY, rightEarMaxY);
+
+	// Set initial values for the global bounding box based on the face's bounding box
+	float globalMinX = faceMinX;
+	float globalMaxX = faceMaxX;
+	float globalMinY = faceMinY;
+	float globalMaxY = faceMaxY;
+
+	// Update global bounding box based on left ear
+	if (leftEarMinX < globalMinX) globalMinX = leftEarMinX;
+	if (leftEarMaxX > globalMaxX) globalMaxX = leftEarMaxX;
+	if (leftEarMinY < globalMinY) globalMinY = leftEarMinY;
+	if (leftEarMaxY > globalMaxY) globalMaxY = leftEarMaxY;
+
+	// Update global bounding box based on right ear
+	if (rightEarMinX < globalMinX) globalMinX = rightEarMinX;
+	if (rightEarMaxX > globalMaxX) globalMaxX = rightEarMaxX;
+	if (rightEarMinY < globalMinY) globalMinY = rightEarMinY;
+	if (rightEarMaxY > globalMaxY) globalMaxY = rightEarMaxY;
+
+	// Set the global bounding box dimensions
+	setRelativeBoundingBox(globalMinX, globalMaxX, globalMinY, globalMaxY);
+}
+
+
 void SmilingFace::updateAbsoluteBox_() {
-	// Center position and scale
+	// Get current position, scale, and rotation
 	float cx = getX();
 	float cy = getY();
 	float scale = size_;
-	float angleRad = M_PI * getAngle() / 180.f;
+	float angleRad = M_PI * getAngle() / 180.f; // Convert angle to radians for rotation
 	float cosA = cosf(angleRad);
 	float sinA = sinf(angleRad);
 
-	// Rotate and translate each component relative to the face’s center
-	// Face itself
+	if (partAbsoluteBox_.empty()) {
+		// Initialize bounding boxes if they haven't been created yet
+
+		// Index 0 for face, 1 for left ear, and 2 for right ear
+		partAbsoluteBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::ORANGE)); // Face
+		partAbsoluteBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::ORANGE)); // Left Ear
+		partAbsoluteBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::ORANGE)); // Right Ear
+	}
+
+	// Face bounding box with transformation
 	float faceMinX = cx - FACE_RADIUS * scale;
 	float faceMaxX = cx + FACE_RADIUS * scale;
 	float faceMinY = cy - FACE_RADIUS * scale;
 	float faceMaxY = cy + FACE_RADIUS * scale;
+	partAbsoluteBox_[FACE]->setDimensions(faceMinX, faceMaxX, faceMinY, faceMaxY);
 
-	// Left ear
+	// Left ear bounding box with rotation and scale
 	float leftEarX = cx + (LEFT_EAR_X * cosA - LEFT_EAR_Y * sinA) * scale;
 	float leftEarY = cy + (LEFT_EAR_X * sinA + LEFT_EAR_Y * cosA) * scale;
 	float leftEarMinX = leftEarX - EAR_RADIUS * scale;
 	float leftEarMaxX = leftEarX + EAR_RADIUS * scale;
 	float leftEarMinY = leftEarY - EAR_RADIUS * scale;
 	float leftEarMaxY = leftEarY + EAR_RADIUS * scale;
+	partAbsoluteBox_[LEFT_EAR]->setDimensions(leftEarMinX, leftEarMaxX, leftEarMinY, leftEarMaxY);
 
-	// Right ear
+	// Right ear bounding box with rotation and scale
 	float rightEarX = cx + (RIGHT_EAR_X * cosA - RIGHT_EAR_Y * sinA) * scale;
 	float rightEarY = cy + (RIGHT_EAR_X * sinA + RIGHT_EAR_Y * cosA) * scale;
 	float rightEarMinX = rightEarX - EAR_RADIUS * scale;
 	float rightEarMaxX = rightEarX + EAR_RADIUS * scale;
 	float rightEarMinY = rightEarY - EAR_RADIUS * scale;
 	float rightEarMaxY = rightEarY + EAR_RADIUS * scale;
+	partAbsoluteBox_[RIGHT_EAR]->setDimensions(rightEarMinX, rightEarMaxX, rightEarMinY, rightEarMaxY);
 
-	// Left eye
-	float leftEyeX = cx + (LEFT_EYE_X * cosA - LEFT_EYE_Y * sinA) * scale;
-	float leftEyeY = cy + (LEFT_EYE_X * sinA + LEFT_EYE_Y * cosA) * scale;
-	float leftEyeMinX = leftEyeX - EYE_OUTER_RADIUS * scale;
-	float leftEyeMaxX = leftEyeX + EYE_OUTER_RADIUS * scale;
-	float leftEyeMinY = leftEyeY - EYE_OUTER_RADIUS * scale;
-	float leftEyeMaxY = leftEyeY + EYE_OUTER_RADIUS * scale;
 
-	// Right eye
-	float rightEyeX = cx + (RIGHT_EYE_X * cosA - RIGHT_EYE_Y * sinA) * scale;
-	float rightEyeY = cy + (RIGHT_EYE_X * sinA + RIGHT_EYE_Y * cosA) * scale;
-	float rightEyeMinX = rightEyeX - EYE_OUTER_RADIUS * scale;
-	float rightEyeMaxX = rightEyeX + EYE_OUTER_RADIUS * scale;
-	float rightEyeMinY = rightEyeY - EYE_OUTER_RADIUS * scale;
-	float rightEyeMaxY = rightEyeY + EYE_OUTER_RADIUS * scale;
+	float globalMinX = faceMinX;
+	float globalMaxX = faceMaxX;
+	float globalMinY = faceMinY;
+	float globalMaxY = faceMaxY;
 
-	// Mouth
-	float mouthX = cx + (MOUTH_H_OFFSET * cosA - MOUTH_V_OFFSET * sinA) * scale;
-	float mouthY = cy + (MOUTH_H_OFFSET * sinA + MOUTH_V_OFFSET * cosA) * scale;
-	float mouthMinX = mouthX - MOUTH_H_DIAMETER * scale / 2;
-	float mouthMaxX = mouthX + MOUTH_H_DIAMETER * scale / 2;
-	float mouthMinY = mouthY - MOUTH_V_DIAMETER * scale / 2;
-	float mouthMaxY = mouthY + MOUTH_V_DIAMETER * scale / 2;
+	// Compare each coordinate to determine the global min/max
+	if (leftEarMinX < globalMinX) globalMinX = leftEarMinX;
+	if (rightEarMinX < globalMinX) globalMinX = rightEarMinX;
 
-	// Determine the overall min and max values for the bounding box
-	float minX = faceMinX;
-	float maxX = faceMaxX;
-	float minY = faceMinY;
-	float maxY = faceMaxY;
+	if (leftEarMaxX > globalMaxX) globalMaxX = leftEarMaxX;
+	if (rightEarMaxX > globalMaxX) globalMaxX = rightEarMaxX;
 
-	// Compare with each component's bounds
-	// Manually calculate the overall min and max values for x and y
-	if (leftEarMinX < minX) minX = leftEarMinX;
-	if (rightEarMinX < minX) minX = rightEarMinX;
-	if (leftEyeMinX < minX) minX = leftEyeMinX;
-	if (rightEyeMinX < minX) minX = rightEyeMinX;
-	if (mouthMinX < minX) minX = mouthMinX;
+	if (leftEarMinY < globalMinY) globalMinY = leftEarMinY;
+	if (rightEarMinY < globalMinY) globalMinY = rightEarMinY;
 
-	if (leftEarMaxX > maxX) maxX = leftEarMaxX;
-	if (rightEarMaxX > maxX) maxX = rightEarMaxX;
-	if (leftEyeMaxX > maxX) maxX = leftEyeMaxX;
-	if (rightEyeMaxX > maxX) maxX = rightEyeMaxX;
-	if (mouthMaxX > maxX) maxX = mouthMaxX;
+	if (leftEarMaxY > globalMaxY) globalMaxY = leftEarMaxY;
+	if (rightEarMaxY > globalMaxY) globalMaxY = rightEarMaxY;
 
-	if (leftEarMinY < minY) minY = leftEarMinY;
-	if (rightEarMinY < minY) minY = rightEarMinY;
-	if (leftEyeMinY < minY) minY = leftEyeMinY;
-	if (rightEyeMinY < minY) minY = rightEyeMinY;
-	if (mouthMinY < minY) minY = mouthMinY;
-
-	if (leftEarMaxY > maxY) maxY = leftEarMaxY;
-	if (rightEarMaxY > maxY) maxY = rightEarMaxY;
-	if (leftEyeMaxY > maxY) maxY = leftEyeMaxY;
-	if (rightEyeMaxY > maxY) maxY = rightEyeMaxY;
-	if (mouthMaxY > maxY) maxY = mouthMaxY;
-
-	// Set the absolute bounding box with the calculated values
-	setAbsoluteBoundingBox(minX, maxX, minY, maxY);
+	// Set the global bounding box
+	setAbsoluteBoundingBox(globalMinX, globalMaxX, globalMinY, globalMaxY);
 }
+
 
 
 #if 0

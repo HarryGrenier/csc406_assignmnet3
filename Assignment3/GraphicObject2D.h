@@ -12,11 +12,15 @@
 #include <stdio.h>
 #include "World2D.h"
 #include "BoundingBox.h"
+#include <vector>
 
 namespace earshooter
 {
 	class GraphicObject2D
 	{
+		protected:
+			std::vector<std::unique_ptr<BoundingBox>> partRelativeBox_;
+			std::vector<std::unique_ptr<BoundingBox> > partAbsoluteBox_;
 		private:
 			float cx_, cy_, angle_;
 			float vx_, vy_, spin_;
@@ -24,7 +28,6 @@ namespace earshooter
 			bool drawContour_;
 			std::unique_ptr<BoundingBox> relativeBox_;
 			std::unique_ptr<BoundingBox> absoluteBox_;
-			
 			/** creation index of the object
 			 */
 			unsigned int index_;
@@ -56,7 +59,6 @@ namespace earshooter
 			}
 
 		public:
-
 			/**	Creates a GraphicObject2D object with the specified position,
 			 * velocity, spin, and color
 			 * @PARAM x	x coordinates of the SmilingFace
