@@ -74,6 +74,13 @@ void BoundingBox::draw(void) const
 	glPopMatrix();
 }
 
+bool BoundingBox::intersects(const BoundingBox& other) const {
+	return !(getXmax() < other.getXmin() ||
+		getXmin() > other.getXmax() ||
+		getYmax() < other.getYmin() ||
+		getYmin() > other.getYmax());
+}
+
 WorldPoint BoundingBox::getCornerUL(void) const
 {
 	return WorldPoint{xmin_, ymax_};

@@ -280,8 +280,7 @@ void myDisplayFunc(void)
 
 	for (auto obj : objList)
 			obj->draw();
-	// Draw projectiles
-	Projectile::drawProjectiles();
+
 	switch(World2D::worldType)
 	{
 		case WorldType::WINDOW_WORLD:
@@ -619,9 +618,6 @@ void myTimerFunc(int value)
 
 		// Remove any objects marked as nullptr
 		objList.remove(nullptr);
-
-		// Update projectiles
-		Projectile::updateProjectiles(dt);
 	}
 
 	// Trigger rendering as needed
@@ -962,7 +958,8 @@ int main(int argc, char * argv[])
 	glutTimerFunc(physicsHeartBeat,	myTimerFunc,		0);
 	//			  time	    name of		value to pass
 	//			  in ms		function	to the func
-	
+	Projectile::setObjectList(&objList);
+
 	//	Now we can do application-level
 	applicationInit();
 

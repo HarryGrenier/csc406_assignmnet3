@@ -88,9 +88,11 @@ GraphicObject2D::~GraphicObject2D()
 #pragma mark Rendering and animation
 //--------------------------------------
 #endif
-
 UpdateStatus GraphicObject2D::update(float dt)
 {
+	if (dead)
+		return UpdateStatus::DEAD;
+
 	UpdateStatus status = UpdateStatus::NORMAL;
 	cx_ += vx_*dt;
 	cy_ += vy_*dt;
@@ -336,6 +338,12 @@ void GraphicObject2D::setColor(float r, float g, float b)
 	g_ = g;
 	b_ = b;
 }
+
+void GraphicObject2D::setDead(bool isDead)
+{
+	dead = isDead;
+}
+
 
 void GraphicObject2D::setDrawContour(bool drawContour)
 {

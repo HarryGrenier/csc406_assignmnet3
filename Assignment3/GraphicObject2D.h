@@ -19,10 +19,7 @@ namespace earshooter
 	enum class ObjectType {
 		Generic,
 		SpaceShip,
-		Projectile,
-		Triangle,
-		ellipse,
-		rectangle
+		Projectile
 	};
 	class GraphicObject2D
 	{
@@ -36,6 +33,7 @@ namespace earshooter
 			bool drawContour_;
 			std::unique_ptr<BoundingBox> relativeBox_;
 			std::unique_ptr<BoundingBox> absoluteBox_;
+			bool dead = false;
 			/** creation index of the object
 			 */
 			unsigned int index_;
@@ -69,6 +67,8 @@ namespace earshooter
 		public:
 
 			virtual ObjectType getObjectType() const { return ObjectType::Generic; }
+
+
 			/**	Creates a GraphicObject2D object with the specified position,
 			 * velocity, spin, and color
 			 * @PARAM x	x coordinates of the SmilingFace
@@ -215,6 +215,9 @@ namespace earshooter
 				return isInside(pt.x, pt.y);
 			}
 			
+			void setDead(bool isDead);
+
+
 			/**	Reports whether this object is set to draw its contour
 			 *	@RETURN 	true if the object draws its contour
 			 */

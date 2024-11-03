@@ -21,6 +21,7 @@ namespace earshooter
 	
 		public:
 		
+			bool intersects(const BoundingBox& other) const;
 			/** The empty box (0, 0, 0, 0)
 			 */
 			static const BoundingBox NULL_BOX;

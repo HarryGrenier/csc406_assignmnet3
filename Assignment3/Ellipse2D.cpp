@@ -17,8 +17,8 @@ using namespace earshooter;
 //	Workaround for that pesky M_PI lack on Windows
 #ifndef M_PI
 #define	M_PI 3.14159265f
-#endif
 
+#endif
 //	Prototypes for "file-level private" functions
 const int Ellipse2D::numCirclePts_ = 24;
 float** Ellipse2D::circlePts_;
