@@ -17,6 +17,7 @@
     <ClCompile Include="prog01.cpp" />
     <ClCompile Include="Rectangle2D.cpp" />
     <ClCompile Include="SmilingFace.cpp" />
+    <ClCompile Include="SpaceShip.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="World2D.cpp" />
   </ItemGroup>
@@ -28,6 +29,7 @@
     <ClInclude Include="GraphicObject2D.h" />
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="SmilingFace.h" />
+    <ClInclude Include="SpaceShip.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="World2D.h" />
   </ItemGroup>

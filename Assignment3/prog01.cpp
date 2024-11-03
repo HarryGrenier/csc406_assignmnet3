@@ -45,6 +45,7 @@
 #include "Ellipse2D.h"
 #include "Triangle.h"
 #include "SmilingFace.h"
+#include "SpaceShip.h"
 
 using namespace std;
 using namespace earshooter;
@@ -893,6 +894,8 @@ void applicationInit()
 	glutAddMenuEntry("-", MenuItemID::SEPARATOR);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
+	objList.push_back(make_shared<SpaceShip>(0.f, 0.f, 90.0f, 1.f, 1.0f, 0.f, 0.f, true,
+		0.f, 0.f, 0.f));
 	//	Create a bunch of objects
 	for (int k=0; k< NUM_OBJECTS; k++)
 	{
