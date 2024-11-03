@@ -20,6 +20,10 @@ namespace earshooter
 		 */
 		float radius_;
 
+
+		float angularVelocity_; // Angular velocity in degrees per second
+
+
 		/** creation index of the SpaceShip
 		 */
 		unsigned int index_;
@@ -49,6 +53,8 @@ namespace earshooter
 
 
 	public:
+		void setAngularVelocity(float angularVelocity) { angularVelocity_ = angularVelocity; }
+		float getAngularVelocity() const { return angularVelocity_; }
 
 		/**	Creates a SpaceShip object with the specified position, dimensions,
 		 * velocity, spin, and color

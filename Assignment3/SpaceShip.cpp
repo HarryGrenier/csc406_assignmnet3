@@ -39,6 +39,7 @@ SpaceShip::SpaceShip(float cx, float cy, float angle, float radius, float r,
 	float g, float b, bool drawContour, float vx, float vy, float spin)
 	: GraphicObject2D(cx, cy, angle, r, g, b, drawContour, vx, vy, spin),
 	//
+	angularVelocity_(0.0f),
 	radius_(radius),
 	index_(count_++)
 {
@@ -93,37 +94,75 @@ void SpaceShip::draw_() const
 {
 	float r = getR(), g = getG(), b = getB();
 
-	//	save the initial reference frame
+	// Save the initial reference frame
 	glPushMatrix();
 
+	// Scale based on radius
 	glScalef(radius_, radius_, 1.f);
 
+	// Set the spaceship color
 	glColor3f(r, g, b);
+
+	// main body of the spaceship
 	glBegin(GL_POLYGON);
-	//	 vertex coordinates are relative to the center of the SpaceShip
-	glVertex2fv(xy_[0]);
-	glVertex2fv(xy_[1]);
-	glVertex2fv(xy_[2]);
+	glVertex2f(0.0f, 1.0f);             // Nose
+	glVertex2f(-0.6f, -0.8f);           // Left rear
+	glVertex2f(0.0f, -0.5f);            // Center rear
+	glVertex2f(0.6f, -0.8f);            // Right rear
 	glEnd();
 
-	if (getDrawContour())
-	{
-		// simply invert the filling color
-		glColor3f(1.f - r, 1.f - g, 1.f - b);
+	// Draw wings
+	glColor3f(r * 0.7f, g * 0.7f, b * 0.7f); // Slightly darker color for contrast
+	glBegin(GL_TRIANGLES);
+	// Left wing
+	glVertex2f(-0.4f, -0.5f);
+	glVertex2f(-1.0f, -1.2f);
+	glVertex2f(-0.4f, -1.0f);
+
+	// Right wing
+	glVertex2f(0.4f, -0.5f);
+	glVertex2f(1.0f, -1.2f);
+	glVertex2f(0.4f, -1.0f);
+	glEnd();
+
+	// Draw engine
+	glColor3f(0.2f, 0.2f, 0.2f); // Dark color for the engine
+	glBegin(GL_POLYGON);
+	glVertex2f(-0.2f, -0.8f);
+	glVertex2f(0.2f, -0.8f);
+	glVertex2f(0.2f, -1.0f);
+	glVertex2f(-0.2f, -1.0f);
+	glEnd();
+
+	// Draw cockpit window
+	glColor3f(1.0f, 1.0f, 1.0f); // White color for the cockpit window
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(0.0f, 0.6f); // Center of the cockpit
+	for (int i = 0; i <= 20; ++i) {
+		float angle = 2 * M_PI * i / 20;
+		glVertex2f(0.1f * cos(angle), 0.6f + 0.1f * sin(angle));
+	}
+	glEnd();
+
+	// If drawContour is enabled
+	if (getDrawContour()) {
+		glColor3f(1.f - r, 1.f - g, 1.f - b); // Invert color for the contour
 		glBegin(GL_LINE_LOOP);
-		//	 vertex coordinates are relative to the center of the SpaceShip
-		glVertex2fv(xy_[0]);
-		glVertex2fv(xy_[1]);
-		glVertex2fv(xy_[2]);
+		glVertex2f(0.0f, 1.0f);
+		glVertex2f(-0.6f, -0.8f);
+		glVertex2f(0.0f, -0.5f);
+		glVertex2f(0.6f, -0.8f);
 		glEnd();
 	}
 
-	//	restore the original scale
+	// Restore the original scale
 	glPopMatrix();
 }
 
 UpdateStatus SpaceShip::update(float dt)
 {
+
+	setAngle(getAngle() + angularVelocity_ * dt);
 	//	call function of the parent class
 	UpdateStatus status = GraphicObject2D::update(dt);
 
@@ -202,6 +241,8 @@ void SpaceShip::updateAbsoluteBox_() {
 	// Set the absolute bounding box using the calculated min and max values
 	setAbsoluteBoundingBox(minX, maxX, minY, maxY);
 }
+
+
 #if 0
 //--------------------------------------
 #pragma mark -

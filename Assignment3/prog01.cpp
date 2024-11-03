@@ -122,6 +122,7 @@ void myMouseMotionHandler(int x, int y);
 void myMousePassiveMotionHandler(int x, int y);
 void myEntryHandler(int state);
 void myKeyHandler(unsigned char c, int x, int y);
+void myKeyUpHandler(unsigned char c, int x, int y);
 void myMenuHandler(int value);
 void mySubmenuHandler(int colorIndex);
 void myTimerFunc(int val);
@@ -225,7 +226,7 @@ string stringLine = "";
 int textColorIndex = 0;
 int bgndColorIndex = 0;//BGND_COLOR[0];
 
-WorldType World2D::worldType = WorldType::WINDOW_WORLD;
+WorldType World2D::worldType = WorldType::SPHERE_WORLD;
 bool World2D::drawReferenceFrames = false;
 
 list<shared_ptr<GraphicObject2D> > objList;
@@ -245,6 +246,8 @@ uniform_real_distribution<float> speedDist(0.4f*MAX_SPEED, MAX_SPEED);
 uniform_real_distribution<float> sizeDist(MIN_SIZE, MAX_SIZE);
 uniform_real_distribution<float> xDist(X_MIN, X_MAX);
 uniform_real_distribution<float> yDist(Y_MIN, Y_MAX);
+
+std::shared_ptr<SpaceShip> spaceship;
 
 #if 0
 //--------------------------------------
@@ -529,29 +532,29 @@ void myKeyHandler(unsigned char c, int x, int y)
 			displayText = !displayText;
 			break;
 			
-		//-------------------------
-		//	world mode cases
-		//-------------------------
-		//	activates "window" mode (objects disappear at the edge)
-		case 'w':
-			World2D::worldType = WorldType::WINDOW_WORLD;
-			break;
+		////-------------------------
+		////	world mode cases
+		////-------------------------
+		////	activates "window" mode (objects disappear at the edge)
+		//case 'w':
+		//	World2D::worldType = WorldType::WINDOW_WORLD;
+		//	break;
 
-		//	activates "box" mode (objects bounce off all edges)
-		case 'b':
-			World2D::worldType = WorldType::BOX_WORLD;
-			break;
+		////	activates "box" mode (objects bounce off all edges)
+		//case 'b':
+		//	World2D::worldType = WorldType::BOX_WORLD;
+		//	break;
 
-		//	activates "cylindrical" mode (objects wrap around vertical
-		//			edges, bounce off the horizontal edges)
-		case 'c':
-			World2D::worldType = WorldType::CYLINDER_WORLD;
-			break;
+		////	activates "cylindrical" mode (objects wrap around vertical
+		////			edges, bounce off the horizontal edges)
+		//case 'c':
+		//	World2D::worldType = WorldType::CYLINDER_WORLD;
+		//	break;
 
-		//	activates "spherical" mode (objects wrap around all edges)
-		case 's':
-			World2D::worldType = WorldType::SPHERE_WORLD;
-			break;
+		////	activates "spherical" mode (objects wrap around all edges)
+		//case 's':
+		//	World2D::worldType = WorldType::SPHERE_WORLD;
+		//	break;
 
 		//-----------------------------
 		//	Reference frames
@@ -563,16 +566,42 @@ void myKeyHandler(unsigned char c, int x, int y)
 		//-----------------------------
 		//	Bounding boxes
 		//-----------------------------
-		case 'a':
+		case 'A':
 			BoundingBox::setDrawAbsoluteBoxes(!BoundingBox::absoluteBoxesAreDrawn());
 			break;
 			
 		case 'r':
 			BoundingBox::setDrawRelativeBoxes(!BoundingBox::relativeBoxesAreDrawn());
 			break;
-			
+			//-------------------------
+			// Spaceship movement
+			//-------------------------
+		case 'a': // 'A' key pressed for left rotation
+			if (spaceship) {
+				spaceship->setAngularVelocity(100.0f); // Start counterclockwise rotation
+			}
+			break;
+
 		default:
 			break;
+	}
+}
+
+void myKeyUpHandler(unsigned char c, int x, int y)
+{
+	// Silence warning
+	(void)x;
+	(void)y;
+
+	if (spaceship) {
+		switch (c) {
+		case 'a': // 'A' key released, stop rotation
+			spaceship->setAngularVelocity(0.0f); // Stop rotation
+			break;
+
+		default:
+			break;
+		}
 	}
 }
 
@@ -894,8 +923,10 @@ void applicationInit()
 	glutAddMenuEntry("-", MenuItemID::SEPARATOR);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-	objList.push_back(make_shared<SpaceShip>(0.f, 0.f, 90.0f, 1.f, 1.0f, 0.f, 0.f, true,
-		0.f, 0.f, 0.f));
+	spaceship = std::make_shared<SpaceShip>(0.f, 0.f, 90.0f, 1.f, 1.0f, 0.f, 0.f, true,
+		0.f, 0.f, 0.f);
+	objList.push_back(spaceship);
+
 	//	Create a bunch of objects
 	for (int k=0; k< NUM_OBJECTS; k++)
 	{
@@ -959,6 +990,7 @@ int main(int argc, char * argv[])
 	glutPassiveMotionFunc(myMousePassiveMotionHandler);
 	glutEntryFunc(myEntryHandler);
 	glutKeyboardFunc(myKeyHandler);
+	glutKeyboardUpFunc(myKeyUpHandler); // For key releases
 	glutTimerFunc(physicsHeartBeat,	myTimerFunc,		0);
 	//			  time	    name of		value to pass
 	//			  in ms		function	to the func
