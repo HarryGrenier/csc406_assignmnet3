@@ -15,6 +15,7 @@
     <ClCompile Include="Ellipse2D.cpp" />
     <ClCompile Include="GraphicObject2D.cpp" />
     <ClCompile Include="prog01.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Rectangle2D.cpp" />
     <ClCompile Include="SmilingFace.cpp" />
     <ClCompile Include="SpaceShip.cpp" />
@@ -27,6 +28,7 @@
     <ClInclude Include="Ellipse2D.h" />
     <ClInclude Include="glPlatform.h" />
     <ClInclude Include="GraphicObject2D.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="SmilingFace.h" />
     <ClInclude Include="SpaceShip.h" />

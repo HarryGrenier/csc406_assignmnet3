@@ -9,6 +9,7 @@
 #define SpaceShip_H
 
 #include "GraphicObject2D.h"
+#include <chrono>
 
 namespace earshooter
 {
@@ -46,15 +47,29 @@ namespace earshooter
 		 */
 		void draw_() const override;
 
+
+		const static int BODY = 0;
+		const static int BOTTOM_WING = 1;
+		const static int TOP_WING = 2;
+		const static int ENGINE = 3;
+
 		void updateRelativeBox_();
-		/** Update the object's absolute bounding box
-		 */
+
 		void updateAbsoluteBox_() override;
+
+		float fireRate_;  // Projectiles per second
+		std::chrono::high_resolution_clock::time_point lastFireTime_;
+
 
 
 	public:
+		ObjectType getObjectType() const override { return ObjectType::SpaceShip; }
 		void setAngularVelocity(float angularVelocity) { angularVelocity_ = angularVelocity; }
 		float getAngularVelocity() const { return angularVelocity_; }
+
+		void SpaceShip::fireProjectile();
+
+
 
 		/**	Creates a SpaceShip object with the specified position, dimensions,
 		 * velocity, spin, and color

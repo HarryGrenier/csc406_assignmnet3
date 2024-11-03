@@ -16,6 +16,14 @@
 
 namespace earshooter
 {
+	enum class ObjectType {
+		Generic,
+		SpaceShip,
+		Projectile,
+		Triangle,
+		ellipse,
+		rectangle
+	};
 	class GraphicObject2D
 	{
 		protected:
@@ -59,6 +67,8 @@ namespace earshooter
 			}
 
 		public:
+
+			virtual ObjectType getObjectType() const { return ObjectType::Generic; }
 			/**	Creates a GraphicObject2D object with the specified position,
 			 * velocity, spin, and color
 			 * @PARAM x	x coordinates of the SmilingFace
@@ -133,6 +143,10 @@ namespace earshooter
 				return cy_;
 			}
 			
+
+			inline float getVX() const { return vx_; }
+			inline float getVY() const { return vy_; }
+
 			void setPosition(float x, float y);
 			void setPosition(const WorldPoint& pt);
 			

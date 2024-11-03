@@ -46,6 +46,7 @@
 #include "Triangle.h"
 #include "SmilingFace.h"
 #include "SpaceShip.h"
+#include "Projectile.h"
 
 using namespace std;
 using namespace earshooter;
@@ -279,7 +280,8 @@ void myDisplayFunc(void)
 
 	for (auto obj : objList)
 			obj->draw();
-		
+	// Draw projectiles
+	Projectile::drawProjectiles();
 	switch(World2D::worldType)
 	{
 		case WorldType::WINDOW_WORLD:
@@ -419,33 +421,12 @@ void myResizeFunc(int w, int h)
 //	This function is called when a mouse event occurs.  This event, of type s
 //	(up, down, dragged, etc.), occurs on a particular button of the mouse.
 //
-void myMouseHandler(int button, int state, int ix, int iy)
-{
-	WorldPoint wpt = pixelToWorld(ix, iy);
-	switch (button)
-	{
-		case GLUT_LEFT_BUTTON:
-			if (state == GLUT_DOWN)
-			{
-				bool clickedOnStuff = false;
-				for (auto obj : objList)
-				{
-					if (obj->isInside(wpt)) {
-						cout << "clicked on object (base: " << obj->getBaseIndex()
-							 << ", final class: " << obj->getIndex() << ")" << endl;
-						clickedOnStuff = true;
-					}
-				}
-			}
-			else if (state == GLUT_UP)
-			{
-			}
-			break;
-			
-		default:
-			break;
+void myMouseHandler(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		spaceship->fireProjectile();
 	}
 }
+
 
 
 void myMouseMotionHandler(int ix, int iy)
@@ -500,9 +481,9 @@ void myKeyHandler(unsigned char c, int x, int y)
 			break;
 		
 		case ' ':
-			isAnimated = !isAnimated;
-			if (isAnimated)
-				animationJustStarted = true;
+			if (spaceship) {
+				spaceship->fireProjectile();
+			}
 			break;
 		
 		//-------------------------
@@ -607,16 +588,16 @@ void myKeyUpHandler(unsigned char c, int x, int y)
 
 void myTimerFunc(int value)
 {
-	static int updateFrameIndex=0;
+	static int updateFrameIndex = 0;
 	static chrono::high_resolution_clock::time_point lastTime = chrono::high_resolution_clock::now();
 
-	// re-prime the timer
+	// Re-prime the timer
 	glutTimerFunc(physicsHeartBeat, myTimerFunc, value);
 
 	if (isAnimated)
 	{
 		chrono::high_resolution_clock::time_point currentTime = chrono::high_resolution_clock::now();
-		float dt = chrono::duration_cast<chrono::duration<float> >(currentTime - lastTime).count();
+		float dt = chrono::duration_cast<chrono::duration<float>>(currentTime - lastTime).count();
 		if (animationJustStarted)
 		{
 			dt = 0.f;
@@ -624,42 +605,29 @@ void myTimerFunc(int value)
 		}
 		lastTime = currentTime;
 
-//		for (constObjIter iter = objList.begin(); iter != objList.end(); iter++)
+		// Update all objects in objList
 		for (objIter iter = objList.begin(); iter != objList.end(); iter++)
-
 		{
-
 			UpdateStatus status = (*iter)->update(dt);
 
-
-
 			if (status == UpdateStatus::DEAD)
-
 			{
-
-				//	If the list holds the sole shared pointer to the object
-
-				//	this will drop the number of references to 0 and the
-
-				//	object's destructor will be called.
-
+				// Set to nullptr for removal later
 				*iter = nullptr;
-
 			}
-
 		}
 
-		//	And then we remove by value all null entries of the list
-
+		// Remove any objects marked as nullptr
 		objList.remove(nullptr);
+
+		// Update projectiles
+		Projectile::updateProjectiles(dt);
 	}
-	
-	//	And finally I perform the rendering
-	//	ideally not as often as physics update
+
+	// Trigger rendering as needed
 	if (updateFrameIndex++ % renderRate == 0)
 		glutPostRedisplay();
 }
-
 
 
 //	This  is where the menu item selected is identified.  This is
@@ -923,7 +891,7 @@ void applicationInit()
 	glutAddMenuEntry("-", MenuItemID::SEPARATOR);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-	spaceship = std::make_shared<SpaceShip>(0.f, 0.f, 90.0f, 1.f, 1.0f, 0.f, 0.f, true,
+	spaceship = std::make_shared<SpaceShip>(0.f, 0.f, 0.f, 1.f, 1.0f, 0.f, 0.f, true,
 		0.f, 0.f, 0.f);
 	objList.push_back(spaceship);
 

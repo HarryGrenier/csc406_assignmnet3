@@ -25,6 +25,7 @@ namespace earshooter
 			 */
 			static const BoundingBox NULL_BOX;
 
+
 			/**	Creates a new bounding box at set dimensions and color.
 			 *
 			 * Note: Should verify that xmin ≤ xmax and ymin ≤ ymax
