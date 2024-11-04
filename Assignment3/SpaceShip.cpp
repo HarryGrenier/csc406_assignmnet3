@@ -45,7 +45,11 @@ SpaceShip::SpaceShip(float cx, float cy, float angle, float radius, float r,
 	index_(count_++),
 	fireRate_(5.0f),  // Set fire rate to 5 projectiles per second
 	lastFireTime_(std::chrono::high_resolution_clock::now()), // Initialize lastFireTime
-	health_(100)
+	health_(100),
+	vx_(0.0f),
+	vy_(0.0f),
+	thrustActive_(false),
+	thrust_(2.0f) // Adjust thrust power
 {
 	liveCount_++;
 	updateRelativeBox_();
@@ -179,20 +183,30 @@ void SpaceShip::draw_() const
 
 UpdateStatus SpaceShip::update(float dt)
 {
-	// Update the spaceship's angle
+	// Update the spaceship's angle based on angular velocity
 	setAngle(getAngle() + angularVelocity_ * dt);
+
+	// Apply thrust if active
+	if (thrustActive_) {
+		float angleRad = M_PI * getAngle() / 180.0f;  // Convert angle to radians
+		vx_ += thrust_ * cos(angleRad) * dt;  // Update horizontal velocity
+		vy_ += thrust_ * sin(angleRad) * dt;  // Update vertical velocity
+	}
+
+	// Update the position based on velocity
+	setPosition(getX() + vx_ * dt, getY() + vy_ * dt);
+
 	// Call the parent class update method
 	UpdateStatus status = GraphicObject2D::update(dt);
 
 	// Collision detection with generic objects
 	for (const auto& obj : *objList_) {
-		// Check for collisions with generic objects only
 		if (obj->getObjectType() == ObjectType::Generic &&
 			this->getAbsoluteBoundingBox().intersects(obj->getAbsoluteBoundingBox())) {
 
-			decreaseHealth(25);  // Decrease health by 10 upon collision
-			obj->setDead(true);  // Mark the generic object as dead
-			break;               // Stop after processing one collision per update
+			decreaseHealth(25);  // Decrease health upon collision
+			obj->setDead(true);  // Mark the object as dead
+			break;               // Process one collision per update
 		}
 	}
 
@@ -202,6 +216,7 @@ UpdateStatus SpaceShip::update(float dt)
 
 	return status;
 }
+
 
 
 const std::list<std::shared_ptr<GraphicObject2D>>* SpaceShip::objList_ = nullptr;

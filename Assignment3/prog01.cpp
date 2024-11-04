@@ -563,13 +563,21 @@ void myKeyHandler(unsigned char c, int x, int y)
 		//-------------------------
 		// Spaceship movement
 		//-------------------------
-	case 'a': // 'A' key pressed for left rotation
-		if (spaceship && spaceship->cantmove()) {
+	case 'a': // Rotate left
+		if (spaceship && spaceship->isAlive() && spaceship->cantmove()) {
 			spaceship->setAngularVelocity(200.0f); // Start counterclockwise rotation
 		}
-		else
-		{
-			spaceship->setAngularVelocity(0.0f);
+		break;
+
+	case 'd': // Rotate right
+		if (spaceship && spaceship->isAlive() && spaceship->cantmove()) {
+			spaceship->setAngularVelocity(-200.0f); // Start clockwise rotation
+		}
+		break;
+
+	case 'w': // Thrust forward
+		if (spaceship && spaceship->isAlive()) {
+			spaceship->setThrustActive(true); // Activate thrust
 		}
 		break;
 
@@ -580,14 +588,19 @@ void myKeyHandler(unsigned char c, int x, int y)
 
 void myKeyUpHandler(unsigned char c, int x, int y)
 {
-	// Silence warning
+	// Silence warnings
 	(void)x;
 	(void)y;
 
-	if (spaceship) {
+	if (spaceship && spaceship->isAlive()) {
 		switch (c) {
-		case 'a': // 'A' key released, stop rotation
+		case 'a': // Stop counterclockwise rotation
+		case 'd': // Stop clockwise rotation
 			spaceship->setAngularVelocity(0.0f); // Stop rotation
+			break;
+
+		case 'w': // Stop thrust
+			spaceship->setThrustActive(false); // Deactivate thrust
 			break;
 
 		default:
@@ -595,6 +608,7 @@ void myKeyUpHandler(unsigned char c, int x, int y)
 		}
 	}
 }
+
 
 
 void mySpecialKeyHandler(int key, int x, int y)
@@ -605,19 +619,29 @@ void mySpecialKeyHandler(int key, int x, int y)
 	if (spaceship) {
 		switch (key) {
 		case GLUT_KEY_LEFT:  // Left arrow key
-			if (spaceship && spaceship->cantmove()) {
+			if (spaceship->isAlive() && spaceship->cantmove()) {
 				spaceship->setAngularVelocity(200.0f); // Start counterclockwise rotation
 			}
-			else
-			{
-				spaceship->setAngularVelocity(0.0f);
+			break;
+
+		case GLUT_KEY_RIGHT:  // Right arrow key
+			if (spaceship->isAlive() && spaceship->cantmove()) {
+				spaceship->setAngularVelocity(-200.0f); // Start clockwise rotation
 			}
 			break;
+
+		case GLUT_KEY_UP:  // Up arrow key
+			if (spaceship->isAlive()) {
+				spaceship->setThrustActive(true); // Activate thrust
+			}
+			break;
+
 		default:
 			break;
 		}
 	}
 }
+
 
 void mySpecialKeyUpHandler(int key, int x, int y)
 {
@@ -627,7 +651,12 @@ void mySpecialKeyUpHandler(int key, int x, int y)
 	if (spaceship) {
 		switch (key) {
 		case GLUT_KEY_LEFT:  // Left arrow key released
+		case GLUT_KEY_RIGHT: // Right arrow key released
 			spaceship->setAngularVelocity(0.0f); // Stop rotation
+			break;
+
+		case GLUT_KEY_UP:  // Up arrow key released
+			spaceship->setThrustActive(false); // Deactivate thrust
 			break;
 
 		default:
@@ -635,6 +664,7 @@ void mySpecialKeyUpHandler(int key, int x, int y)
 		}
 	}
 }
+
 
 void generateRandomAsteroid() {
 	// Generate random properties for the asteroid
@@ -683,7 +713,7 @@ void myTimerFunc(int value)
 	static int updateFrameIndex = 0;
 	static chrono::high_resolution_clock::time_point lastTime = chrono::high_resolution_clock::now();
 	static float timeSinceLastAsteroid = 0.0f;  // Track time for asteroid spawning
-	const float asteroidSpawnInterval = 1.0f;    // Spawn every 1 seconds
+	const float asteroidSpawnInterval = 2.0f;    // Spawn every 2 seconds
 
 	// Re-prime the timer
 	glutTimerFunc(physicsHeartBeat, myTimerFunc, value);

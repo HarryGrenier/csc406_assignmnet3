@@ -22,6 +22,12 @@ namespace earshooter
 	class SpaceShip : public GraphicObject2D
 	{
 	private:
+
+		float vx_;           // Horizontal velocity component
+		float vy_;           // Vertical velocity component
+		bool thrustActive_;  // Whether thrust is currently applied
+		float thrust_;       // The magnitude of the thrust applied
+
 		/** List of objects for collision detection */
 		static const std::list<std::shared_ptr<GraphicObject2D>>* objList_;
 
@@ -71,6 +77,17 @@ namespace earshooter
 		std::chrono::high_resolution_clock::time_point lastFireTime_;
 
 	public:
+
+		/** Activates or deactivates thrust
+		 * @param active Whether thrust is active
+		 */
+		void setThrustActive(bool active) { thrustActive_ = active; }
+
+		/** Checks if thrust is currently active
+		 * @return true if thrust is active, false otherwise
+		 */
+		bool isThrustActive() const { return thrustActive_; }
+
 		/** @return The object type of the spaceship */
 		ObjectType getObjectType() const override { return ObjectType::SpaceShip; }
 
