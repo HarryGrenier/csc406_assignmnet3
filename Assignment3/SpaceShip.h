@@ -2,7 +2,7 @@
 //  SpaceShip.h
 //  Week 05 - Prog 1
 //
-//  Created by Jean-Yves Hervé on 2024-09-10.
+//  Created by Harry Grenier on 2024-11-3.
 //
 
 #ifndef SpaceShip_H
@@ -10,183 +10,205 @@
 
 #include "GraphicObject2D.h"
 #include <chrono>
+#include <list>
 
 namespace earshooter
 {
+	/**
+	 * @class SpaceShip
+	 * @brief Represents a 2D spaceship object with various properties and methods for handling movement,
+	 *        collision, drawing, and projectile firing.
+	 */
 	class SpaceShip : public GraphicObject2D
 	{
 	private:
+		/** List of objects for collision detection */
+		static const std::list<std::shared_ptr<GraphicObject2D>>* objList_;
 
-		/** Radius of the isoceles SpaceShip
-		 */
+		/** Radius of the isosceles spaceship */
 		float radius_;
 
+		/** Angular velocity in degrees per second */
+		float angularVelocity_;
 
-		float angularVelocity_; // Angular velocity in degrees per second
-
-
-		/** creation index of the SpaceShip
-		 */
+		/** Unique creation index for each SpaceShip instance */
 		unsigned int index_;
 
-		/** array of coordinates of an isoceles SpaceShip
-		 */
+		/** Array of coordinates representing an isosceles SpaceShip */
 		static float xy_[3][2];
 
-		/**	Counter of the number of SpaceShip objects created
-		 */
+		/** Counter of the number of SpaceShip objects created */
 		static unsigned int count_;
 
-		/**	Counter of the number of SpaceShip objects still "alive"
-		 */
+		/** Counter of the number of SpaceShip objects still "alive" */
 		static unsigned int liveCount_;
 
-		/**	Private rendering function for this class.  Translation and rotation
-		 *	have already been applied by the root class, so this function only applies
-		 *	scaling prior to rendering.
+		/** Private rendering function for this class. Translation and rotation
+		 * have already been applied by the base class, so this function only applies
+		 * scaling prior to rendering.
 		 */
 		void draw_() const override;
 
+		/** Health value for the spaceship */
+		int health_;
 
-		const static int BODY = 0;
-		const static int BOTTOM_WING = 1;
-		const static int TOP_WING = 2;
-		const static int ENGINE = 3;
+		/** Constants representing parts of the spaceship */
+		static const int BODY = 0;
+		static const int BOTTOM_WING = 1;
+		static const int TOP_WING = 2;
+		static const int ENGINE = 3;
 
+		/** Updates the relative bounding box of the spaceship */
 		void updateRelativeBox_();
 
+		/** Updates the absolute bounding box of the spaceship */
 		void updateAbsoluteBox_() override;
 
-		float fireRate_;  // Projectiles per second
+		/** Fire rate in projectiles per second */
+		float fireRate_;
+
+		/** Time of the last fired projectile */
 		std::chrono::high_resolution_clock::time_point lastFireTime_;
 
-
-
 	public:
+		/** @return The object type of the spaceship */
 		ObjectType getObjectType() const override { return ObjectType::SpaceShip; }
+
+		/** Sets the angular velocity of the spaceship */
 		void setAngularVelocity(float angularVelocity) { angularVelocity_ = angularVelocity; }
+
+		/** @return The current angular velocity of the spaceship */
 		float getAngularVelocity() const { return angularVelocity_; }
 
-		void SpaceShip::fireProjectile();
+		/** Sets the object list for collision detection */
+		static void setObjectList(const std::list<std::shared_ptr<GraphicObject2D>>* objListPtr);
 
+		/** @return True if the spaceship is alive, based on health */
+		bool isAlive() const { return health_ > 0; }
 
+		/** @return True if the spaceship can still move, based on health */
+		bool cantmove() const { return health_ > 25; }
 
-		/**	Creates a SpaceShip object with the specified position, dimensions,
-		 * velocity, spin, and color
-		 * @PARAM x	x coordinates of the SpaceShip's origin
-		 * @PARAM y	y coordinates of the SpaceShip's origin
-		 * @PARAM angle	orientation of the SpaceShip (in degree)
-		 * @PARAM radius radius of the SpaceShip
-		 * @PARAM red red component [0,1] of the SpaceShip's color
-		 * @PARAM green green component [0,1] of the SpaceShip's color
-		 * @PARAM blue blue component [0,1] of the SpaceShip's color
-		 * @PARAM drawContour should a contour be drawn for the object
-		 * @PARAM vx x component of the velocity vector
-		 * @PARAM vy y component of the velocity vector
-		 * @PARAM spin angular velocity of the object
+		/** Fires a projectile from the spaceship */
+		void fireProjectile();
+
+		/** Decreases the spaceship's health by a specified amount */
+		void decreaseHealth(int amount);
+
+		/** @return The current health of the spaceship */
+		int getHealth() const;
+
+		/**
+		 * Constructor to create a SpaceShip object with specified parameters.
+		 * @param x X-coordinate of the spaceship's origin
+		 * @param y Y-coordinate of the spaceship's origin
+		 * @param angle Orientation of the spaceship in degrees
+		 * @param radius Radius of the spaceship
+		 * @param r Red component of the spaceship's color
+		 * @param g Green component of the spaceship's color
+		 * @param b Blue component of the spaceship's color
+		 * @param drawContour Flag to indicate if contour should be drawn
+		 * @param vx X component of the velocity vector
+		 * @param vy Y component of the velocity vector
+		 * @param spin Angular velocity of the spaceship
 		 */
 		SpaceShip(float x, float y, float angle, float radius,
 			float r, float g, float b, bool drawContour,
 			float vx = 0.f, float vy = 0.f, float spin = 0.f);
 
-		/**	Creates a SpaceShip object with the specified position, dimensions,
-		 * velocity, spin, and color
-		 * @PARAM pt	coordinates of the SpaceShip's origin
-		 * @PARAM angle	orientation of the SpaceShip (in degree)
-		 * @PARAM radius radius of the SpaceShip
-		 * @PARAM red red component [0,1] of the SpaceShip's color
-		 * @PARAM green green component [0,1] of the SpaceShip's color
-		 * @PARAM blue blue component [0,1] of the SpaceShip's color
-		 * @PARAM drawContour should a contour be drawn for the object
-		 * @PARAM vx x component of the velocity vector
-		 * @PARAM vy y component of the velocity vector
-		 * @PARAM spin angular velocity of the object
+		/**
+		 * Alternative constructor with a WorldPoint for position.
+		 * @param pt Coordinates of the spaceship's origin
+		 * @param angle Orientation of the spaceship in degrees
+		 * @param radius Radius of the spaceship
+		 * @param r Red component of the spaceship's color
+		 * @param g Green component of the spaceship's color
+		 * @param b Blue component of the spaceship's color
+		 * @param drawContour Flag to indicate if contour should be drawn
+		 * @param vx X component of the velocity vector
+		 * @param vy Y component of the velocity vector
+		 * @param spin Angular velocity of the spaceship
 		 */
 		SpaceShip(const WorldPoint& pt, float angle, float radius,
 			float r, float g, float b, bool drawContour,
 			float vx = 0.f, float vy = 0.f, float spin = 0.f);
 
-		/**	Creates a SpaceShip object with the specified position, dimensions,
-		 * velocity, spin, and color
-		 * @PARAM x	x coordinates of the SpaceShip's origin
-		 * @PARAM y	y coordinates of the SpaceShip's origin
-		 * @PARAM angle	orientation of the SpaceShip (in degree)
-		 * @PARAM radius radius of the SpaceShip
-		 * @PARAM fillColor the SpaceShip's color
-		 * @PARAM drawContour should a contour be drawn for the object
-		 * @PARAM vx x component of the velocity vector
-		 * @PARAM vy y component of the velocity vector
-		 * @PARAM spin angular velocity of the object
+		/**
+		 * Constructor to create a SpaceShip object with a color index.
+		 * @param x X-coordinate of the spaceship's origin
+		 * @param y Y-coordinate of the spaceship's origin
+		 * @param angle Orientation of the spaceship in degrees
+		 * @param radius Radius of the spaceship
+		 * @param fillColor Color index for the spaceship's color
+		 * @param drawContour Flag to indicate if contour should be drawn
+		 * @param vx X component of the velocity vector
+		 * @param vy Y component of the velocity vector
+		 * @param spin Angular velocity of the spaceship
 		 */
 		SpaceShip(float x, float y, float angle, float radius,
 			ColorIndex fillColor, bool drawContour,
 			float vx = 0.f, float vy = 0.f, float spin = 0.f);
 
-		/**	Creates a SpaceShip object with the specified position, dimensions,
-		 * velocity, spin, and color
-		 * @PARAM pt	coordinates of the SpaceShip's origin
-		 * @PARAM angle	orientation of the SpaceShip (in degree)
-		 * @PARAM radius radius of the SpaceShip
-		 * @PARAM fillColor the SpaceShip's color
-		 * @PARAM drawContour should a contour be drawn for the object
-		 * @PARAM vx x component of the velocity vector
-		 * @PARAM vy y component of the velocity vector
-		 * @PARAM spin angular velocity of the object
+		/**
+		 * Alternative constructor with WorldPoint and color index.
+		 * @param pt Coordinates of the spaceship's origin
+		 * @param angle Orientation of the spaceship in degrees
+		 * @param radius Radius of the spaceship
+		 * @param fillColor Color index for the spaceship's color
+		 * @param drawContour Flag to indicate if contour should be drawn
+		 * @param vx X component of the velocity vector
+		 * @param vy Y component of the velocity vector
+		 * @param spin Angular velocity of the spaceship
 		 */
 		SpaceShip(const WorldPoint& pt, float angle, float radius,
 			ColorIndex fillColor, bool drawContour,
 			float vx = 0.f, float vy = 0.f, float spin = 0.f);
 
-		/** Destructor
-		 */
+		/** Destructor */
 		~SpaceShip();
 
-		/** Checks if the point whose coordinates are passed is inside the
-		 *	object
-		 *	@PARAM x	x coordinate of the point to test
-		 *	@PARAM y	y coordinate of the point to test
-		 *	@RETURN true if the point lies inside this object
+		/**
+		 * Checks if a point is inside the spaceship.
+		 * @param x X coordinate of the point to test
+		 * @param y Y coordinate of the point to test
+		 * @return True if the point lies inside the spaceship
 		 */
 		bool isInside(float x, float y) const override;
 
-		/** Returns this isoceles SpaceShip's radius
+		/**
+		 * @return The radius of the spaceship
 		 */
-		inline float getRadius() const
-		{
-			return radius_;
-		}
+		inline float getRadius() const { return radius_; }
 
-		/** Updates the state of the SpaceShip object.  I put this one in just
-		 * to show that a subclass may have more to update than just the position
-		 * and orientation
-		 *	@PARAM dt	time (in s) elapsed since the last call of this function
-		 *	@RETURN		status value indicating what happened during update
+		/**
+		 * Updates the state of the spaceship.
+		 * @param dt Time elapsed since the last update call
+		 * @return Status value indicating the result of the update
 		 */
 		UpdateStatus update(float dt) override;
 
-		/** Returns this SpaceShip's unique SmilingFace creation index
-		 *	@RETURN this SpaceShip's unique SmilingFace creation index
+		/**
+		 * @return The unique index of this spaceship
 		 */
 		unsigned int getIndex() const override;
 
-		/**	Returns the number of SpaceShip2D objects created
-		 *	@return	the number of SpaceShip2D objects created
+		/**
+		 * @return The total number of SpaceShip objects created
 		 */
 		static unsigned int getCount();
 
-		/**	Returns the number of SpaceShip2D objects still "alive"
-		 *	@return	the number of SpaceShip2D objects still "alive"
+		/**
+		 * @return The number of SpaceShip objects still "alive"
 		 */
 		static unsigned int getLiveCount();
 
-
-		//	Deleted constructors and operators
+		// Deleted constructors and operators
 		SpaceShip() = delete;
 		SpaceShip(const SpaceShip&) = delete;
 		SpaceShip(SpaceShip&&) = delete;
 		SpaceShip& operator =(const SpaceShip&) = delete;
 		SpaceShip& operator =(SpaceShip&&) = delete;
-
 	};
 }
-#endif //	SpaceShip_H
+
+#endif // SpaceShip_H

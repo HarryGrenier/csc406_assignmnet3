@@ -66,41 +66,44 @@ using namespace earshooter;
 //	bothersome to do the casting to int each each time.
 
 
-enum MenuItemID {	SEPARATOR = -1,
-					//
-					QUIT_MENU = 0,
-					OTHER_MENU_ITEM,
-					SOME_ITEM = 10
+enum MenuItemID {
+	SEPARATOR = -1,
+	//
+	QUIT_MENU = 0,
+	OTHER_MENU_ITEM,
+	SOME_ITEM = 10
 };
 
-enum TextColorSubmenuItemID {	FIRST_TEXT = 11,
-								RED_TEXT = 11,
-								GREEN_TEXT,
-								WHITE_TEXT,
-								MAGENTA_TEXT,
-								//
-								MAX_COUNT_TEXT
+enum TextColorSubmenuItemID {
+	FIRST_TEXT = 11,
+	RED_TEXT = 11,
+	GREEN_TEXT,
+	WHITE_TEXT,
+	MAGENTA_TEXT,
+	//
+	MAX_COUNT_TEXT
 };
 const int NUM_TEXT_COLORS = MAX_COUNT_TEXT - FIRST_TEXT;
 
-enum BackgroundColorSubmenuItemID {	FIRST_BGND = 21,
-									NO_BACKGROUND = 21,
-									LIGHT_GREY_BGND,
-									DARK_GREY_BGND,
-									GREEN_BGND,
-									BLUE_BGND,
-									BROWN_BGND,
-									//
-									MAX_COUNT_BGND
+enum BackgroundColorSubmenuItemID {
+	FIRST_BGND = 21,
+	NO_BACKGROUND = 21,
+	LIGHT_GREY_BGND,
+	DARK_GREY_BGND,
+	GREEN_BGND,
+	BLUE_BGND,
+	BROWN_BGND,
+	//
+	MAX_COUNT_BGND
 };
 const int NUM_BGND_COLORS = MAX_COUNT_BGND - FIRST_BGND;
 
 enum FontSize {
-					SMALL_FONT_SIZE = 0,
-					MEDIUM_FONT_SIZE,
-					LARGE_FONT_SIZE,
-					//
-					NUM_FONT_SIZES
+	SMALL_FONT_SIZE = 0,
+	MEDIUM_FONT_SIZE,
+	LARGE_FONT_SIZE,
+	//
+	NUM_FONT_SIZES
 };
 
 using objIter = list<shared_ptr<GraphicObject2D> >::iterator;
@@ -124,13 +127,15 @@ void myMousePassiveMotionHandler(int x, int y);
 void myEntryHandler(int state);
 void myKeyHandler(unsigned char c, int x, int y);
 void myKeyUpHandler(unsigned char c, int x, int y);
+void mySpecialKeyHandler(int key, int x, int y);
+void mySpecialKeyUpHandler(int key, int x, int y);
 void myMenuHandler(int value);
 void mySubmenuHandler(int colorIndex);
 void myTimerFunc(int val);
 void applicationInit();
 //
 void drawSquare(float cx, float cy, float size, float r,
-                    float g, float b, bool contour);
+	float g, float b, bool contour);
 
 #if 0
 //--------------------------------------
@@ -146,7 +151,7 @@ void drawSquare(float cx, float cy, float size, float r,
 
 //	This one is really for Macs (32 pixel is traditional height of top menu bar
 const int 	INIT_WIN_X = 10,
-			INIT_WIN_Y = 32;
+INIT_WIN_Y = 32;
 
 //	Define world dimensions (cascaded down to the World2D class)
 //	Also, some speed limits based on world dimensions.
@@ -168,37 +173,37 @@ const int TEXT_V_PAD = 5;
 #define MEDIUM_DISPLAY_FONT   GLUT_BITMAP_HELVETICA_12
 #define LARGE_DISPLAY_FONT    GLUT_BITMAP_HELVETICA_18
 
-const string TEXT_COLOR_STR[NUM_TEXT_COLORS] = {"white",		//	WHITE_TEXT
+const string TEXT_COLOR_STR[NUM_TEXT_COLORS] = { "white",		//	WHITE_TEXT
 												"red",			//	RED_TEXT
 												"green",		//	GREEN_TEXT
-												"magenta"};		//	MAGENTA_TEXT
+												"magenta" };		//	MAGENTA_TEXT
 
-const string BGND_COLOR_STR[NUM_BGND_COLORS] = {"none",			//
+const string BGND_COLOR_STR[NUM_BGND_COLORS] = { "none",			//
 												"light gray",	//	LIGHT_GREY_BGND
 												"dark gray",	//	DARK_GREY_BGND
 												"green",		//	GREEN_BGND
 												"blue",			//	BLUE_BGND
-												"brown"};		//	BROWN_BGND
+												"brown" };		//	BROWN_BGND
 
 const GLfloat TEXT_COLOR[NUM_TEXT_COLORS][3] = { {1.0f, 1.0f, 1.0f},	//	WHITE_TEXT
 												 {1.0f, 0.0f, 0.0f},	//	RED_TEXT
 												 {0.0f, 0.8f, 0.0f},	//	GREEN_TEXT
-												 {1.0f, 0.0f, 1.0f}};	//	MAGENTA_TEXT
+												 {1.0f, 0.0f, 1.0f} };	//	MAGENTA_TEXT
 
 const GLfloat BGND_COLOR[NUM_BGND_COLORS][3] = { {0.0f, 0.0f, 0.0f},	//	NO_BACKGROUND
 												 {0.7f, 0.7f, 0.7f},	//	LIGHT_GREY_BGND
 												 {0.4f, 0.4f, 0.4f},	//	DARK_GREY_BGND
 												 {0.0f, 0.6f, 0.0f},	//	GREEN_BGND
 												 {0.0f, 0.0f, 0.6f},	//	BLUE_BGND
-												 {0.6f, 0.3f, 0.0f}};	//	BROWN_BGND
+												 {0.6f, 0.3f, 0.0f} };	//	BROWN_BGND
 const GLfloat* WIN_CLEAR_COLOR = BGND_COLOR[0];
 
 const string WORLD_TYPE_STR[] = {
 									"Window world",
 									"Box world",
 									"Cylinder world",
-									"Sphere world"};
-									
+									"Sphere world" };
+
 const bool displayTextOnLeft = false;
 const bool displayTextOnTop = true;
 const FontSize fontSize = LARGE_FONT_SIZE;
@@ -214,7 +219,7 @@ const int NUM_OBJECTS = 15;
 
 time_t startTime = -1;
 int winWidth = 800,
-    winHeight = 800;
+winHeight = 800;
 
 bool trackEntry = false;
 bool trackMousePointer = false;
@@ -240,10 +245,10 @@ bool animationJustStarted = false;
 random_device myRandDev;
 default_random_engine myEngine(myRandDev());
 uniform_int_distribution<int> shapeDist(0, 3);	//	triangle - rect - ellipse - face
-uniform_real_distribution<float> angleDist(0, 2*M_PI);
+uniform_real_distribution<float> angleDist(0, 2 * M_PI);
 uniform_real_distribution<float> colorDist(0.f, 1.f);
 uniform_real_distribution<float> spinDist(-MAX_SPIN, +MAX_SPIN);
-uniform_real_distribution<float> speedDist(0.4f*MAX_SPEED, MAX_SPEED);
+uniform_real_distribution<float> speedDist(0.4f * MAX_SPEED, MAX_SPEED);
 uniform_real_distribution<float> sizeDist(MIN_SIZE, MAX_SIZE);
 uniform_real_distribution<float> xDist(X_MIN, X_MAX);
 uniform_real_distribution<float> yDist(Y_MIN, Y_MAX);
@@ -273,80 +278,80 @@ void myDisplayFunc(void)
 	glLoadIdentity();
 
 	glPushMatrix();
-	
+
 	//--------------------------
 	//	basic drawing code
 	//--------------------------
 
 	for (auto obj : objList)
+		obj->draw();
+
+	switch (World2D::worldType)
+	{
+	case WorldType::WINDOW_WORLD:
+	case WorldType::BOX_WORLD:
+		break;
+
+	case WorldType::CYLINDER_WORLD:
+		glPushMatrix();
+		//	draw the  left quadrant
+		glTranslatef(-World2D::WIDTH, 0.f, 0.f);
+		for (auto obj : objList)
 			obj->draw();
 
-	switch(World2D::worldType)
-	{
-		case WorldType::WINDOW_WORLD:
-		case WorldType::BOX_WORLD:
-		break;
-
-		case WorldType::CYLINDER_WORLD:
-			glPushMatrix();
-			//	draw the  left quadrant
-			glTranslatef(-World2D::WIDTH, 0.f, 0.f);
-			for (auto obj : objList)
-				obj->draw();
-			
-			//	draw right quadrant
-			glTranslatef(2.f*World2D::WIDTH, 0.f, 0.f);
-			for (auto obj : objList)
-				obj->draw();
-			glPopMatrix();
+		//	draw right quadrant
+		glTranslatef(2.f * World2D::WIDTH, 0.f, 0.f);
+		for (auto obj : objList)
+			obj->draw();
+		glPopMatrix();
 		break;
 
 
-		case WorldType::SPHERE_WORLD:
-			glPushMatrix();
-			// Draw central (original) position
-			for (auto obj : objList)
-				obj->draw();
+	case WorldType::SPHERE_WORLD:
+		glPushMatrix();
+		// Draw central (original) position
+		for (auto obj : objList)
+			obj->draw();
 
-			// Draw all eight surrounding copies
+		// Draw all eight surrounding copies
 
-			// Left and Right translations
-			glTranslatef(-World2D::WIDTH, 0.f, 0.f);
-			for (auto obj : objList)
-				obj->draw();
-			glTranslatef(2.f * World2D::WIDTH, 0.f, 0.f);
-			for (auto obj : objList)
-				obj->draw();
-			glTranslatef(-World2D::WIDTH, 0.f, 0.f); // reset to center
+		// Left and Right translations
+		glTranslatef(-World2D::WIDTH, 0.f, 0.f);
+		for (auto obj : objList)
+			obj->draw();
+		glTranslatef(2.f * World2D::WIDTH, 0.f, 0.f);
+		for (auto obj : objList)
+			obj->draw();
+		glTranslatef(-World2D::WIDTH, 0.f, 0.f); // reset to center
 
-			// Top and Bottom translations
-			glTranslatef(0.f, World2D::HEIGHT, 0.f);
-			for (auto obj : objList)
-				obj->draw();
-			glTranslatef(0.f, -2.f * World2D::HEIGHT, 0.f);
-			for (auto obj : objList)
-				obj->draw();
-			glTranslatef(0.f, World2D::HEIGHT, 0.f); // reset to center
+		// Top and Bottom translations
+		glTranslatef(0.f, World2D::HEIGHT, 0.f);
+		for (auto obj : objList)
+			obj->draw();
+		glTranslatef(0.f, -2.f * World2D::HEIGHT, 0.f);
+		for (auto obj : objList)
+			obj->draw();
+		glTranslatef(0.f, World2D::HEIGHT, 0.f); // reset to center
 
-			// Top-Left, Top-Right, Bottom-Left, Bottom-Right translations
-			glTranslatef(-World2D::WIDTH, World2D::HEIGHT, 0.f);
-			for (auto obj : objList)
-				obj->draw();
-			glTranslatef(2.f * World2D::WIDTH, 0.f, 0.f);
-			for (auto obj : objList)
-				obj->draw();
-			glTranslatef(0.f, -2.f * World2D::HEIGHT, 0.f);
-			for (auto obj : objList)
-				obj->draw();
-			glTranslatef(-2.f * World2D::WIDTH, 0.f, 0.f);
-			for (auto obj : objList)
-				obj->draw();
+		// Top-Left, Top-Right, Bottom-Left, Bottom-Right translations
+		glTranslatef(-World2D::WIDTH, World2D::HEIGHT, 0.f);
+		for (auto obj : objList)
+			obj->draw();
+		glTranslatef(2.f * World2D::WIDTH, 0.f, 0.f);
+		for (auto obj : objList)
+			obj->draw();
+		glTranslatef(0.f, -2.f * World2D::HEIGHT, 0.f);
+		for (auto obj : objList)
+			obj->draw();
+		glTranslatef(-2.f * World2D::WIDTH, 0.f, 0.f);
+		for (auto obj : objList)
+			obj->draw();
 
-			glPopMatrix();
+		glPopMatrix();
 		break;
-	
-		default:
-			break;
+
+	default:
+		break;
 	}
 
 	//	Display textual info
@@ -355,27 +360,27 @@ void myDisplayFunc(void)
 	//	So we must undo the scaling to be back in pixels, which how text is drawn for now.
 	if (displayText)
 	{
-	//	First, translate to the upper-left corner
+		//	First, translate to the upper-left corner
 		glTranslatef(World2D::X_MIN, World2D::Y_MAX, 0.f);
-		
+
 		//	Then reverse the scaling: back in pixels, making sure that y now points down
 		glScalef(World2D::drawInPixelScale, -World2D::drawInPixelScale, 1.f);
 
 		char statusLine[256];
 		sprintf(statusLine, "%s | Run time: %d s | %d live ˚objects (%d created) | Mouse last at (%d, %d)",
-								WORLD_TYPE_STR[static_cast<int>(World2D::worldType)].c_str(),
-								static_cast<int>(time(nullptr)-startTime),
-								static_cast<int>(GraphicObject2D::getBaseLiveCount()),
-								static_cast<int>(GraphicObject2D::getBaseCount()),
-								lastX, lastY);
+			WORLD_TYPE_STR[static_cast<int>(World2D::worldType)].c_str(),
+			static_cast<int>(time(nullptr) - startTime),
+			static_cast<int>(GraphicObject2D::getBaseLiveCount()),
+			static_cast<int>(GraphicObject2D::getBaseCount()),
+			lastX, lastY);
 		displayTextualInfo(statusLine, 0);		//	first row
 
 		if (stringLine != "")
-		displayTextualInfo(stringLine, 1);		//	second row
+			displayTextualInfo(stringLine, 1);		//	second row
 	}
 
 	glPopMatrix();
-	
+
 	drawReferenceFrame();
 
 	//	We were drawing into the back buffer(s), now they should be brought
@@ -392,13 +397,13 @@ void myDisplayFunc(void)
 void myResizeFunc(int w, int h)
 {
 	winWidth = w;
-    winHeight = h;
-	
+	winHeight = h;
+
 	if (winWidth != w || winHeight != h)
 	{
 		glutReshapeWindow(winWidth, winHeight);
 	}
-	
+
 	//	This calls says that I want to use the entire dimension of the window for my drawing.
 	glViewport(0, 0, winWidth, winHeight);
 
@@ -414,7 +419,7 @@ void myResizeFunc(int w, int h)
 
 	//	When it's done, request a refresh of the display
 	glutPostRedisplay();
- }
+}
 
 
 //	This function is called when a mouse event occurs.  This event, of type s
@@ -422,7 +427,9 @@ void myResizeFunc(int w, int h)
 //
 void myMouseHandler(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		spaceship->fireProjectile();
+		if (spaceship && spaceship->isAlive()) {
+			spaceship->fireProjectile();
+		}
 	}
 }
 
@@ -469,49 +476,49 @@ void myEntryHandler(int state)
 void myKeyHandler(unsigned char c, int x, int y)
 {
 	// silence warning
-	(void) x;
-	(void) y;
-	
+	(void)x;
+	(void)y;
+
 	switch (c)
 	{
-		case 'q':
-		case 27:
-			exit(0);
-			break;
-		
-		case ' ':
-			if (spaceship) {
-				spaceship->fireProjectile();
-			}
-			break;
-		
+	case 'q':
+	case 27:
+		exit(0);
+		break;
+
+	case ' ':
+		if (spaceship && spaceship->isAlive()) {
+			spaceship->fireProjectile();
+		}
+		break;
+
 		//-------------------------
 		//	mouse tracking cases
 		//-------------------------
-		case 'm':
-			trackMousePointer = !trackMousePointer;
-			break;
+	case 'm':
+		trackMousePointer = !trackMousePointer;
+		break;
 
-		case 'p':
-			trackPassiveMousePointer = !trackPassiveMousePointer;
-			break;
-			
-		case 'e':
-			trackEntry = !trackEntry;
-			break;
-			
+	case 'p':
+		trackPassiveMousePointer = !trackPassiveMousePointer;
+		break;
+
+	case 'e':
+		trackEntry = !trackEntry;
+		break;
+
 		//-------------------------
 		//	text display cases
 		//-------------------------
-		case 'i':
-			cout << "Enter a new line of text: ";
-			getline(cin, stringLine);
-			break;
-		
-		case 't':
-			displayText = !displayText;
-			break;
-			
+	case 'i':
+		cout << "Enter a new line of text: ";
+		getline(cin, stringLine);
+		break;
+
+	case 't':
+		displayText = !displayText;
+		break;
+
 		////-------------------------
 		////	world mode cases
 		////-------------------------
@@ -539,31 +546,35 @@ void myKeyHandler(unsigned char c, int x, int y)
 		//-----------------------------
 		//	Reference frames
 		//-----------------------------
-		case 'f':
-			World2D::drawReferenceFrames = !World2D::drawReferenceFrames;
-			break;
-			
+	case 'f':
+		World2D::drawReferenceFrames = !World2D::drawReferenceFrames;
+		break;
+
 		//-----------------------------
 		//	Bounding boxes
 		//-----------------------------
-		case 'A':
-			BoundingBox::setDrawAbsoluteBoxes(!BoundingBox::absoluteBoxesAreDrawn());
-			break;
-			
-		case 'r':
-			BoundingBox::setDrawRelativeBoxes(!BoundingBox::relativeBoxesAreDrawn());
-			break;
-			//-------------------------
-			// Spaceship movement
-			//-------------------------
-		case 'a': // 'A' key pressed for left rotation
-			if (spaceship) {
-				spaceship->setAngularVelocity(100.0f); // Start counterclockwise rotation
-			}
-			break;
+	case 'A':
+		BoundingBox::setDrawAbsoluteBoxes(!BoundingBox::absoluteBoxesAreDrawn());
+		break;
 
-		default:
-			break;
+	case 'r':
+		BoundingBox::setDrawRelativeBoxes(!BoundingBox::relativeBoxesAreDrawn());
+		break;
+		//-------------------------
+		// Spaceship movement
+		//-------------------------
+	case 'a': // 'A' key pressed for left rotation
+		if (spaceship && spaceship->cantmove()) {
+			spaceship->setAngularVelocity(200.0f); // Start counterclockwise rotation
+		}
+		else
+		{
+			spaceship->setAngularVelocity(0.0f);
+		}
+		break;
+
+	default:
+		break;
 	}
 }
 
@@ -585,10 +596,94 @@ void myKeyUpHandler(unsigned char c, int x, int y)
 	}
 }
 
+
+void mySpecialKeyHandler(int key, int x, int y)
+{
+	(void)x;  // Suppress unused parameter warning
+	(void)y;  // Suppress unused parameter warning
+
+	if (spaceship) {
+		switch (key) {
+		case GLUT_KEY_LEFT:  // Left arrow key
+			if (spaceship && spaceship->cantmove()) {
+				spaceship->setAngularVelocity(200.0f); // Start counterclockwise rotation
+			}
+			else
+			{
+				spaceship->setAngularVelocity(0.0f);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void mySpecialKeyUpHandler(int key, int x, int y)
+{
+	(void)x;  // Suppress unused parameter warning
+	(void)y;  // Suppress unused parameter warning
+
+	if (spaceship) {
+		switch (key) {
+		case GLUT_KEY_LEFT:  // Left arrow key released
+			spaceship->setAngularVelocity(0.0f); // Stop rotation
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
+void generateRandomAsteroid() {
+	// Generate random properties for the asteroid
+	float x = xDist(myEngine);
+	float y = yDist(myEngine);
+	float angle = angleDist(myEngine);
+	float direction = angleDist(myEngine);
+	float speed = speedDist(myEngine);
+	float spin = spinDist(myEngine);
+	float r = colorDist(myEngine);
+	float g = colorDist(myEngine);
+	float b = colorDist(myEngine);
+	float size = sizeDist(myEngine);
+
+	// Choose random shape for the asteroid
+	switch (shapeDist(myEngine)) {
+	case 0:
+		objList.push_back(make_shared<Triangle>(x, y, angle, size, r, g, b, true,
+			speed * cosf(direction), speed * sinf(direction), spin));
+		break;
+
+	case 1:
+		objList.push_back(make_shared<earshooter::Rectangle2D>(x, y, angle, size, size, r, g, b, true,
+			speed * cosf(direction), speed * sinf(direction), spin));
+		break;
+
+	case 2:
+		objList.push_back(make_shared<earshooter::Ellipse2D>(x, y, angle, size, size, r, g, b, true,
+			speed * cosf(direction), speed * sinf(direction), spin));
+		break;
+
+	case 3:
+		objList.push_back(make_shared<SmilingFace>(x, y, angle, size, r, g, b,
+			speed * cosf(direction), speed * sinf(direction), spin));
+		break;
+
+	default:
+		break;
+	}
+}
+
+
+
 void myTimerFunc(int value)
 {
 	static int updateFrameIndex = 0;
 	static chrono::high_resolution_clock::time_point lastTime = chrono::high_resolution_clock::now();
+	static float timeSinceLastAsteroid = 0.0f;  // Track time for asteroid spawning
+	const float asteroidSpawnInterval = 1.0f;    // Spawn every 1 seconds
 
 	// Re-prime the timer
 	glutTimerFunc(physicsHeartBeat, myTimerFunc, value);
@@ -605,25 +700,33 @@ void myTimerFunc(int value)
 		lastTime = currentTime;
 
 		// Update all objects in objList
-		for (objIter iter = objList.begin(); iter != objList.end(); iter++)
+		for (auto iter = objList.begin(); iter != objList.end(); )
 		{
 			UpdateStatus status = (*iter)->update(dt);
-
 			if (status == UpdateStatus::DEAD)
 			{
-				// Set to nullptr for removal later
-				*iter = nullptr;
+				iter = objList.erase(iter);  // Remove dead objects
+			}
+			else
+			{
+				++iter;
 			}
 		}
 
-		// Remove any objects marked as nullptr
-		objList.remove(nullptr);
+		// Periodically generate new asteroids
+		timeSinceLastAsteroid += dt;
+		if (timeSinceLastAsteroid >= asteroidSpawnInterval && spaceship->isAlive()) {
+			generateRandomAsteroid();
+			timeSinceLastAsteroid = 0.0f;  // Reset the spawn timer
+		}
 	}
 
 	// Trigger rendering as needed
 	if (updateFrameIndex++ % renderRate == 0)
 		glutPostRedisplay();
 }
+
+
 
 
 //	This  is where the menu item selected is identified.  This is
@@ -633,20 +736,20 @@ void myMenuHandler(int choice)
 	switch (choice)
 	{
 		//	Exit/Quit
-		case QUIT_MENU:
-			exit(0);
-			break;
-		
+	case QUIT_MENU:
+		exit(0);
+		break;
+
 		//	Do something
-		case OTHER_MENU_ITEM:
-			break;
-		
-		default:	//	this should not happen
-			break;
-	
+	case OTHER_MENU_ITEM:
+		break;
+
+	default:	//	this should not happen
+		break;
+
 	}
 
-    glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 //  in this example my submenu selection indicates the keyboard handling
@@ -655,23 +758,23 @@ void mySubmenuHandler(int choice)
 {
 	switch (choice)
 	{
-		case RED_TEXT:
-		case GREEN_TEXT:
-		case WHITE_TEXT:
-		case MAGENTA_TEXT:
-			textColorIndex = choice - FIRST_TEXT;
-			break;
-			
-		case LIGHT_GREY_BGND:
-		case DARK_GREY_BGND:
-		case GREEN_BGND:
-		case BLUE_BGND:
-		case BROWN_BGND:
-			bgndColorIndex = choice - FIRST_BGND;
-			break;
-		
-		default:
-			break;
+	case RED_TEXT:
+	case GREEN_TEXT:
+	case WHITE_TEXT:
+	case MAGENTA_TEXT:
+		textColorIndex = choice - FIRST_TEXT;
+		break;
+
+	case LIGHT_GREY_BGND:
+	case DARK_GREY_BGND:
+	case GREEN_BGND:
+	case BLUE_BGND:
+	case BROWN_BGND:
+		bgndColorIndex = choice - FIRST_BGND;
+		break;
+
+	default:
+		break;
 	}
 }
 
@@ -683,174 +786,174 @@ void mySubmenuHandler(int choice)
 #endif
 
 void drawSquare(float cx, float cy, float size, float r,
-                    float g, float b, bool drawContour)
+	float g, float b, bool drawContour)
 {
-	float halfSize = 0.5f*size;
-	
+	float halfSize = 0.5f * size;
+
 	glColor3f(r, g, b);
 	glBegin(GL_POLYGON);
-		glVertex2f(cx - halfSize, cy - halfSize);
-		glVertex2f(cx + halfSize, cy - halfSize);
-		glVertex2f(cx + halfSize, cy + halfSize);
-		glVertex2f(cx - halfSize, cy + halfSize);
+	glVertex2f(cx - halfSize, cy - halfSize);
+	glVertex2f(cx + halfSize, cy - halfSize);
+	glVertex2f(cx + halfSize, cy + halfSize);
+	glVertex2f(cx - halfSize, cy + halfSize);
 	glEnd();
 
 	if (drawContour)
 	{
 		// simply invert the filling color
-		glColor3f(1.f-r, 1.f-g, 1.f-b);
+		glColor3f(1.f - r, 1.f - g, 1.f - b);
 		glBegin(GL_LINE_LOOP);
-			glVertex2f(cx - halfSize, cy - halfSize);
-			glVertex2f(cx + halfSize, cy - halfSize);
-			glVertex2f(cx + halfSize, cy + halfSize);
-			glVertex2f(cx - halfSize, cy + halfSize);
+		glVertex2f(cx - halfSize, cy - halfSize);
+		glVertex2f(cx + halfSize, cy - halfSize);
+		glVertex2f(cx + halfSize, cy + halfSize);
+		glVertex2f(cx - halfSize, cy + halfSize);
 		glEnd();
 	}
 }
-				
 
-void displayTextualInfo(const string& infoStr, int textRow){
+
+void displayTextualInfo(const string& infoStr, int textRow) {
 	displayTextualInfo(infoStr.c_str(), textRow);
 }
 
 void displayTextualInfo(const char* infoStr, int textRow)
 {
-    //-----------------------------------------------
-    //  0.  Build the string to display <-- parameter
-    //-----------------------------------------------
-    int infoLn = static_cast<int> (strlen(infoStr));
+	//-----------------------------------------------
+	//  0.  Build the string to display <-- parameter
+	//-----------------------------------------------
+	int infoLn = static_cast<int> (strlen(infoStr));
 
-    //-----------------------------------------------
-    //  1.  Determine the string's length (in pixels)
-    //-----------------------------------------------
-    int textWidth = 0, fontHeight=-1;
-	switch(fontSize)
+	//-----------------------------------------------
+	//  1.  Determine the string's length (in pixels)
+	//-----------------------------------------------
+	int textWidth = 0, fontHeight = -1;
+	switch (fontSize)
 	{
-		case SMALL_FONT_SIZE:
-			fontHeight = 10;
-			for (int k=0; k<infoLn; k++)
-			{
-				textWidth += glutBitmapWidth(SMALL_DISPLAY_FONT, infoStr[k]);
-			}
-			break;
-		
-		case MEDIUM_FONT_SIZE:
-			fontHeight = 12;
-			for (int k=0; k<infoLn; k++)
-			{
-				textWidth += glutBitmapWidth(MEDIUM_DISPLAY_FONT, infoStr[k]);
-			}
-			break;
-		
-		case LARGE_FONT_SIZE:
-			fontHeight = 16;
-			for (int k=0; k<infoLn; k++)
-			{
-				textWidth += glutBitmapWidth(LARGE_DISPLAY_FONT, infoStr[k]);
-			}
-			break;
-			
-		default:
-			break;
+	case SMALL_FONT_SIZE:
+		fontHeight = 10;
+		for (int k = 0; k < infoLn; k++)
+		{
+			textWidth += glutBitmapWidth(SMALL_DISPLAY_FONT, infoStr[k]);
+		}
+		break;
+
+	case MEDIUM_FONT_SIZE:
+		fontHeight = 12;
+		for (int k = 0; k < infoLn; k++)
+		{
+			textWidth += glutBitmapWidth(MEDIUM_DISPLAY_FONT, infoStr[k]);
+		}
+		break;
+
+	case LARGE_FONT_SIZE:
+		fontHeight = 16;
+		for (int k = 0; k < infoLn; k++)
+		{
+			textWidth += glutBitmapWidth(LARGE_DISPLAY_FONT, infoStr[k]);
+		}
+		break;
+
+	default:
+		break;
 	}
 
-    //-----------------------------------------------
-    //  2.  get current material properties
-    //-----------------------------------------------
-    float oldAmb[4], oldDif[4], oldSpec[4], oldShiny;
-    glGetMaterialfv(GL_FRONT, GL_AMBIENT, oldAmb);
-    glGetMaterialfv(GL_FRONT, GL_DIFFUSE, oldDif);
-    glGetMaterialfv(GL_FRONT, GL_SPECULAR, oldSpec);
-    glGetMaterialfv(GL_FRONT, GL_SHININESS, &oldShiny);
+	//-----------------------------------------------
+	//  2.  get current material properties
+	//-----------------------------------------------
+	float oldAmb[4], oldDif[4], oldSpec[4], oldShiny;
+	glGetMaterialfv(GL_FRONT, GL_AMBIENT, oldAmb);
+	glGetMaterialfv(GL_FRONT, GL_DIFFUSE, oldDif);
+	glGetMaterialfv(GL_FRONT, GL_SPECULAR, oldSpec);
+	glGetMaterialfv(GL_FRONT, GL_SHININESS, &oldShiny);
 
-    glPushMatrix();
+	glPushMatrix();
 	if (displayTextOnTop)
-    {
-		glTranslatef(0.f, textRow*(fontHeight+2*TEXT_V_PAD), 0.f);
-    }
+	{
+		glTranslatef(0.f, textRow * (fontHeight + 2 * TEXT_V_PAD), 0.f);
+	}
 	else
-    {
-		glTranslatef(0.f, winHeight - (textRow+1)*(fontHeight+2*TEXT_V_PAD),0.f);
+	{
+		glTranslatef(0.f, winHeight - (textRow + 1) * (fontHeight + 2 * TEXT_V_PAD), 0.f);
 	}
 
-    //-----------------------------------------------
-    //  3.  Clear background rectangle if required
-    //-----------------------------------------------
+	//-----------------------------------------------
+	//  3.  Clear background rectangle if required
+	//-----------------------------------------------
 	if (bgndColorIndex != 0)
-    {
+	{
 		glColor3fv(BGND_COLOR[bgndColorIndex]);
 		glBegin(GL_POLYGON);
-			glVertex2i(0, 0);
-			glVertex2i(0, fontHeight + 2*TEXT_V_PAD);
-			glVertex2i(winWidth, fontHeight + 2*TEXT_V_PAD);
-			glVertex2i(winWidth, 0);
+		glVertex2i(0, 0);
+		glVertex2i(0, fontHeight + 2 * TEXT_V_PAD);
+		glVertex2i(winWidth, fontHeight + 2 * TEXT_V_PAD);
+		glVertex2i(winWidth, 0);
 		glEnd();
 	}
-	
+
 	//	Move "up" from current plane, to make sure that we overwrite
 	glTranslatef(0.f, 0.f, 0.1f);
 
-    //-----------------------------------------------
-    //  4.  Draw the string
-    //-----------------------------------------------    
-    //	Where do we start drawing from
-    int xPos = displayTextOnLeft ? TEXT_H_PAD : winWidth - textWidth - TEXT_H_PAD;
-    int yPos = fontHeight + TEXT_V_PAD;
+	//-----------------------------------------------
+	//  4.  Draw the string
+	//-----------------------------------------------    
+	//	Where do we start drawing from
+	int xPos = displayTextOnLeft ? TEXT_H_PAD : winWidth - textWidth - TEXT_H_PAD;
+	int yPos = fontHeight + TEXT_V_PAD;
 
-    glColor3fv(TEXT_COLOR[textColorIndex]);
-    int x = xPos;
-	switch(fontSize)
+	glColor3fv(TEXT_COLOR[textColorIndex]);
+	int x = xPos;
+	switch (fontSize)
 	{
-		case SMALL_FONT_SIZE:
-			for (int k=0; k<infoLn; k++)
-			{
-				glRasterPos2i(x, yPos);
-				glutBitmapCharacter(SMALL_DISPLAY_FONT, infoStr[k]);
-				x += glutBitmapWidth(SMALL_DISPLAY_FONT, infoStr[k]);
-			}
-			break;
-		
-		case MEDIUM_FONT_SIZE:
-			for (int k=0; k<infoLn; k++)
-			{
-				glRasterPos2i(x, yPos);
-				glutBitmapCharacter(MEDIUM_DISPLAY_FONT, infoStr[k]);
-				x += glutBitmapWidth(MEDIUM_DISPLAY_FONT, infoStr[k]);
-			}
-			break;
-		
-		case LARGE_FONT_SIZE:
-			for (int k=0; k<infoLn; k++)
-			{
-				glRasterPos2i(x, yPos);
-				glutBitmapCharacter(LARGE_DISPLAY_FONT, infoStr[k]);
-				x += glutBitmapWidth(LARGE_DISPLAY_FONT, infoStr[k]);
-			}
-			break;
-			
-		default:
-			break;
+	case SMALL_FONT_SIZE:
+		for (int k = 0; k < infoLn; k++)
+		{
+			glRasterPos2i(x, yPos);
+			glutBitmapCharacter(SMALL_DISPLAY_FONT, infoStr[k]);
+			x += glutBitmapWidth(SMALL_DISPLAY_FONT, infoStr[k]);
+		}
+		break;
+
+	case MEDIUM_FONT_SIZE:
+		for (int k = 0; k < infoLn; k++)
+		{
+			glRasterPos2i(x, yPos);
+			glutBitmapCharacter(MEDIUM_DISPLAY_FONT, infoStr[k]);
+			x += glutBitmapWidth(MEDIUM_DISPLAY_FONT, infoStr[k]);
+		}
+		break;
+
+	case LARGE_FONT_SIZE:
+		for (int k = 0; k < infoLn; k++)
+		{
+			glRasterPos2i(x, yPos);
+			glutBitmapCharacter(LARGE_DISPLAY_FONT, infoStr[k]);
+			x += glutBitmapWidth(LARGE_DISPLAY_FONT, infoStr[k]);
+		}
+		break;
+
+	default:
+		break;
 	}
 
-    //-----------------------------------------------
-    //  5.  Restore old material properties
-    //-----------------------------------------------
+	//-----------------------------------------------
+	//  5.  Restore old material properties
+	//-----------------------------------------------
 	glMaterialfv(GL_FRONT, GL_AMBIENT, oldAmb);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, oldDif);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, oldSpec);
-	glMaterialf(GL_FRONT, GL_SHININESS, oldShiny);  
-    
-    //-----------------------------------------------
-    //  6.  Restore reference frame
-    //-----------------------------------------------
-    glPopMatrix();
+	glMaterialf(GL_FRONT, GL_SHININESS, oldShiny);
+
+	//-----------------------------------------------
+	//  6.  Restore reference frame
+	//-----------------------------------------------
+	glPopMatrix();
 }
 
 void printMatrix(const GLfloat* m) {
-    cout << "((" << m[0] << "\t" << m[4] << "\t" << m[8] << "\t" << m[12] << ")" << endl;
-    cout << " (" << m[1] << "\t" << m[5] << "\t" << m[9] << "\t" << m[13] << ")" << endl;
-    cout << " (" << m[2] << "\t" << m[6] << "\t" << m[10] << "\t" << m[14] << ")" << endl;
-    cout << " (" << m[3] << "\t" << m[7] << "\t" << m[11] << "\t" << m[15] << "))" << endl;
+	cout << "((" << m[0] << "\t" << m[4] << "\t" << m[8] << "\t" << m[12] << ")" << endl;
+	cout << " (" << m[1] << "\t" << m[5] << "\t" << m[9] << "\t" << m[13] << ")" << endl;
+	cout << " (" << m[2] << "\t" << m[6] << "\t" << m[10] << "\t" << m[14] << ")" << endl;
+	cout << " (" << m[3] << "\t" << m[7] << "\t" << m[11] << "\t" << m[15] << "))" << endl;
 }
 
 #if 0
@@ -864,13 +967,13 @@ void applicationInit()
 {
 	// Create Menus
 	int myMenu;
-	
+
 	//	Submenu for changing keyboard handling function
 	int myTextColorSubmenu = glutCreateMenu(mySubmenuHandler);
-	for (int k=0, t=FIRST_TEXT; k<NUM_TEXT_COLORS; k++, t++)
+	for (int k = 0, t = FIRST_TEXT; k < NUM_TEXT_COLORS; k++, t++)
 		glutAddMenuEntry(TEXT_COLOR_STR[k].c_str(), t);
 	int myBgndColorSubmenu = glutCreateMenu(mySubmenuHandler);
-	for (int k=0, b=FIRST_BGND; k<NUM_BGND_COLORS; k++, b++)
+	for (int k = 0, b = FIRST_BGND; k < NUM_BGND_COLORS; k++, b++)
 		glutAddMenuEntry(BGND_COLOR_STR[k].c_str(), b);
 
 	// Main menu that the submenus are connected to
@@ -880,53 +983,53 @@ void applicationInit()
 	glutAddMenuEntry("-", MenuItemID::SEPARATOR);
 	glutAddMenuEntry("Other stuff", MenuItemID::OTHER_MENU_ITEM);
 	glutAddMenuEntry("New entry", 64);
-	
+
 	glutAddMenuEntry("-", MenuItemID::SEPARATOR);
 	glutAddSubMenu("Text color:", myTextColorSubmenu);
 	glutAddSubMenu("Background color:", myBgndColorSubmenu);
 	glutAddMenuEntry("-", MenuItemID::SEPARATOR);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-	spaceship = std::make_shared<SpaceShip>(0.f, 0.f, 0.f, 1.f, 1.0f, 0.f, 0.f, true,
+	spaceship = std::make_shared<SpaceShip>(0.f, 0.f, 0.f, 0.5f, 1.0f, 0.f, 0.f, true,
 		0.f, 0.f, 0.f);
 	objList.push_back(spaceship);
 
-	//	Create a bunch of objects
-	for (int k=0; k< NUM_OBJECTS; k++)
-	{
-		float x = xDist(myEngine), y = yDist(myEngine);
-		float angle = angleDist(myEngine);
-		float direction = angleDist(myEngine);
-		float speed = speedDist(myEngine);
-		float spin = spinDist(myEngine);
-		float r = colorDist(myEngine), g = colorDist(myEngine), b = colorDist(myEngine);
-		switch(shapeDist(myEngine))
-		{
-			case 0:
-			objList.push_back(make_shared<Triangle>(x, y, angle, sizeDist(myEngine), r, g, b, true,
-								speed*cosf(direction), speed*sinf(direction), spin));
-			break;
+	////	Create a bunch of objects
+	//for (int k=0; k< NUM_OBJECTS; k++)
+	//{
+	//	float x = xDist(myEngine), y = yDist(myEngine);
+	//	float angle = angleDist(myEngine);
+	//	float direction = angleDist(myEngine);
+	//	float speed = speedDist(myEngine);
+	//	float spin = spinDist(myEngine);
+	//	float r = colorDist(myEngine), g = colorDist(myEngine), b = colorDist(myEngine);
+	//	switch(shapeDist(myEngine))
+	//	{
+	//		case 0:
+	//		objList.push_back(make_shared<Triangle>(x, y, angle, sizeDist(myEngine), r, g, b, true,
+	//							speed*cosf(direction), speed*sinf(direction), spin));
+	//		break;
 
-			case 1:
-			objList.push_back(make_shared<earshooter::Rectangle2D>(x, y, angle, sizeDist(myEngine), sizeDist(myEngine), r, g, b, true,
-								speed*cosf(direction), speed*sinf(direction), spin));
-			break;
+	//		case 1:
+	//		objList.push_back(make_shared<earshooter::Rectangle2D>(x, y, angle, sizeDist(myEngine), sizeDist(myEngine), r, g, b, true,
+	//							speed*cosf(direction), speed*sinf(direction), spin));
+	//		break;
 
-			case 2:
-			objList.push_back(make_shared<earshooter::Ellipse2D>(x, y, angle, sizeDist(myEngine), sizeDist(myEngine), r, g, b, true,
-								speed*cosf(direction), speed*sinf(direction), spin));
-			break;
+	//		case 2:
+	//		objList.push_back(make_shared<earshooter::Ellipse2D>(x, y, angle, sizeDist(myEngine), sizeDist(myEngine), r, g, b, true,
+	//							speed*cosf(direction), speed*sinf(direction), spin));
+	//		break;
 
-			case 3:
-			objList.push_back(make_shared<SmilingFace>(x, y, angle, sizeDist(myEngine), r, g, b,
-								speed*cosf(direction), speed*sinf(direction), spin));
-			break;
+	//		case 3:
+	//		objList.push_back(make_shared<SmilingFace>(x, y, angle, sizeDist(myEngine), r, g, b,
+	//							speed*cosf(direction), speed*sinf(direction), spin));
+	//		break;
 
-			default:
-			break;
-		}
-		
-	}
+	//		default:
+	//		break;
+	//	}
+	//	
+	//}
 
 
 	World2D::setWorld2DBounds(X_MIN, X_MAX, Y_MIN, Y_MAX, winWidth, winHeight);
@@ -935,7 +1038,7 @@ void applicationInit()
 	startTime = time(nullptr);
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
 	//	Initialize glut and create a new window
 	glutInit(&argc, argv);
@@ -945,7 +1048,7 @@ int main(int argc, char * argv[])
 	glutInitWindowPosition(INIT_WIN_X, INIT_WIN_Y);
 	glutCreateWindow("Earshooter Demo");
 	glClearColor(WIN_CLEAR_COLOR[0], WIN_CLEAR_COLOR[1], WIN_CLEAR_COLOR[2], 1.f);
-	
+
 	//	set up the callbacks
 	glutDisplayFunc(myDisplayFunc);
 	glutReshapeFunc(myResizeFunc);
@@ -954,10 +1057,13 @@ int main(int argc, char * argv[])
 	glutPassiveMotionFunc(myMousePassiveMotionHandler);
 	glutEntryFunc(myEntryHandler);
 	glutKeyboardFunc(myKeyHandler);
-	glutKeyboardUpFunc(myKeyUpHandler); // For key releases
-	glutTimerFunc(physicsHeartBeat,	myTimerFunc,		0);
+	glutKeyboardUpFunc(myKeyUpHandler);			   // For key releases
+	glutSpecialFunc(mySpecialKeyHandler);         // For special key presses
+	glutSpecialUpFunc(mySpecialKeyUpHandler);    // For special key releases
+	glutTimerFunc(physicsHeartBeat, myTimerFunc, 0);
 	//			  time	    name of		value to pass
 	//			  in ms		function	to the func
+	SpaceShip::setObjectList(&objList);
 	Projectile::setObjectList(&objList);
 
 	//	Now we can do application-level
@@ -968,7 +1074,7 @@ int main(int argc, char * argv[])
 	//	we set up earlier will be called when the corresponding event
 	//	occurs
 	glutMainLoop();
-	
+
 	//	This will never be executed (the exit point will be in one of the
 	//	callback functions).
 	return 0;

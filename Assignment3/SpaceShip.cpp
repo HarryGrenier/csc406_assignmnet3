@@ -12,6 +12,7 @@
 #include "World2D.h"
 #include "SpaceShip.h"
 #include "Projectile.h"
+#include <iostream>
 
 using namespace std;
 using namespace earshooter;
@@ -43,7 +44,8 @@ SpaceShip::SpaceShip(float cx, float cy, float angle, float radius, float r,
 	radius_(radius),
 	index_(count_++),
 	fireRate_(5.0f),  // Set fire rate to 5 projectiles per second
-	lastFireTime_(std::chrono::high_resolution_clock::now()) // Initialize lastFireTime
+	lastFireTime_(std::chrono::high_resolution_clock::now()), // Initialize lastFireTime
+	health_(100)
 {
 	liveCount_++;
 	updateRelativeBox_();
@@ -76,6 +78,17 @@ SpaceShip::SpaceShip(const WorldPoint& pt, float angle, float radius,
 		COLOR[static_cast<int>(fillColor)][2],
 		drawContour, vx, vy, spin)
 {
+}
+
+void SpaceShip::decreaseHealth(int amount) {
+	health_ -= amount;
+	if (health_ <= 0) {
+		setDead(true);  // Mark the spaceship as dead if health reaches 0
+	}
+}
+
+int SpaceShip::getHealth() const {
+	return health_;
 }
 
 
@@ -113,20 +126,21 @@ void SpaceShip::draw_() const
 	glVertex2f(-0.8f, -0.6f);           // Bottom rear
 	glEnd();
 
-	// Draw wings
-	glColor3f(r * 0.7f, g * 0.7f, b * 0.7f); // Slightly darker color for contrast
-	glBegin(GL_TRIANGLES);
-	// Top wing
-	glVertex2f(-0.5f, 0.4f);
-	glVertex2f(-1.2f, 1.0f);
-	glVertex2f(-1.0f, 0.4f);
+	if (health_ >= 25) {
+		// Draw wings
+		glColor3f(r * 0.7f, g * 0.7f, b * 0.7f); // Slightly darker color for contrast
+		glBegin(GL_TRIANGLES);
+		// Top wing
+		glVertex2f(-0.5f, 0.4f);
+		glVertex2f(-1.2f, 1.0f);
+		glVertex2f(-1.0f, 0.4f);
 
-	// Bottom wing
-	glVertex2f(-0.5f, -0.4f);
-	glVertex2f(-1.2f, -1.0f);
-	glVertex2f(-1.0f, -0.4f);
-	glEnd();
-
+		// Bottom wing
+		glVertex2f(-0.5f, -0.4f);
+		glVertex2f(-1.2f, -1.0f);
+		glVertex2f(-1.0f, -0.4f);
+		glEnd();
+	}
 	// Draw engine
 	glColor3f(0.2f, 0.2f, 0.2f); // Dark color for the engine
 	glBegin(GL_POLYGON);
@@ -162,19 +176,38 @@ void SpaceShip::draw_() const
 }
 
 
+
 UpdateStatus SpaceShip::update(float dt)
 {
-
+	// Update the spaceship's angle
 	setAngle(getAngle() + angularVelocity_ * dt);
-	//	call function of the parent class
+	// Call the parent class update method
 	UpdateStatus status = GraphicObject2D::update(dt);
 
-	//	// change color:  make more green as time passes
-	//	g_ += 0.3f*dt;
-	//	if (g_ > 1.f)
-	//		g_ = 1.f;
+	// Collision detection with generic objects
+	for (const auto& obj : *objList_) {
+		// Check for collisions with generic objects only
+		if (obj->getObjectType() == ObjectType::Generic &&
+			this->getAbsoluteBoundingBox().intersects(obj->getAbsoluteBoundingBox())) {
+
+			decreaseHealth(25);  // Decrease health by 10 upon collision
+			obj->setDead(true);  // Mark the generic object as dead
+			break;               // Stop after processing one collision per update
+		}
+	}
+
+	if (health_ <= 50) {
+		setColor(1.0f, 1.0f, 0.0f); // Change color to indicate low health
+	}
 
 	return status;
+}
+
+
+const std::list<std::shared_ptr<GraphicObject2D>>* SpaceShip::objList_ = nullptr;
+
+void SpaceShip::setObjectList(const std::list<std::shared_ptr<GraphicObject2D>>* objListPtr) {
+    objList_ = objListPtr;
 }
 
 bool SpaceShip::isInside(float x, float y) const
@@ -222,7 +255,7 @@ void SpaceShip::updateRelativeBox_() {
 	float engineMaxY = 0.2f * scale;
 	partRelativeBox_[ENGINE]->setDimensions(engineMinX, engineMaxX, engineMinY, engineMaxY);
 
-	// Calculate and set global bounding box dimensions without std::min and std::max
+	// Calculate and set global bounding box dimensions
 	float globalMinX = bodyMinX;
 	if (topWingMinX < globalMinX) globalMinX = topWingMinX;
 	if (bottomWingMinX < globalMinX) globalMinX = bottomWingMinX;
@@ -248,26 +281,28 @@ void SpaceShip::updateRelativeBox_() {
 }
 
 void SpaceShip::fireProjectile() {
-	// Get the current time
-	auto currentTime = std::chrono::high_resolution_clock::now();
+	if (isAlive()) {
+		// Get the current time
+		auto currentTime = std::chrono::high_resolution_clock::now();
 
-	// Calculate the time since the last projectile was fired
-	float timeSinceLastFire = std::chrono::duration<float>(currentTime - lastFireTime_).count();
+		// Calculate the time since the last projectile was fired
+		float timeSinceLastFire = std::chrono::duration<float>(currentTime - lastFireTime_).count();
 
-	// Check if enough time has passed since the last projectile was fired
-	if (timeSinceLastFire >= 1.0f / fireRate_) {
-		float radAngle = M_PI * getAngle() / 180.0f;
-		float projectileSpeed = 10.0f;
+		// Check if enough time has passed since the last projectile was fired
+		if (timeSinceLastFire >= 1.0f / fireRate_) {
+			float radAngle = M_PI * getAngle() / 180.0f;
+			float projectileSpeed = 10.0f;
 
-		// Calculate the projectile’s velocity based on the spaceship's current heading
-		float vx = projectileSpeed * cosf(radAngle) + getVX();
-		float vy = projectileSpeed * sinf(radAngle) + getVY();
+			// Calculate the projectile’s velocity based on the spaceship's current heading
+			float vx = projectileSpeed * cosf(radAngle) + getVX();
+			float vy = projectileSpeed * sinf(radAngle) + getVY();
 
-		// Create a new projectile with a lifetime, initial position, and velocity
-		Projectile::createProjectile(getX(), getY(), getAngle(), vx, vy, 1.75f);
+			// Create a new projectile with a lifetime, initial position, and velocity
+			Projectile::createProjectile(getX(), getY(), getAngle(), vx, vy, 1.75f);
 
-		// Update the lastFireTime to the current time
-		lastFireTime_ = currentTime;
+			// Update the lastFireTime to the current time
+			lastFireTime_ = currentTime;
+		}
 	}
 }
 
@@ -275,84 +310,22 @@ void SpaceShip::updateAbsoluteBox_() {
 	// Get current position, scale, and rotation
 	float cx = getX();
 	float cy = getY();
-	float scale = radius_; // Scale factor for the spaceship
-	float angleRad = M_PI * getAngle() / 180.0f; // Convert angle to radians
+	float scale = radius_;
+	float angleRad = M_PI * getAngle() / 180.0f;
 	float cosA = cosf(angleRad);
 	float sinA = sinf(angleRad);
 
-	if (partAbsoluteBox_.empty()) {
-		// Initialize bounding boxes if they haven't been created yet
-		partAbsoluteBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::ORANGE)); // Body
-		partAbsoluteBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::ORANGE)); // Left Wing
-		partAbsoluteBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::ORANGE)); // Right Wing
-		partAbsoluteBox_.emplace_back(std::make_unique<BoundingBox>(0, 0, 0, 0, ColorIndex::ORANGE)); // Engine
-	}
+	// Compute approximate min and max X and Y based on the scaled size of the ship
+	float halfWidth = scale * 1.2f; // Adjust as needed for your ship's width
+	float halfHeight = scale * 1.5f; // Adjust as needed for your ship's height
 
-	// Body (with nose) bounding box, accounting for rotation
-	float bodyTipX = cx + cosA * scale;
-	float bodyTipY = cy + sinA * scale;
-	float bodyBackX = cx - 0.6f * cosA * scale;
-	float bodyBackY = cy - 0.8f * sinA * scale;
+	float minX = cx - halfWidth;
+	float maxX = cx + halfWidth;
+	float minY = cy - halfHeight;
+	float maxY = cy + halfHeight;
 
-	// Manually calculate min and max for the body
-	float bodyMinX = (bodyTipX < bodyBackX ? bodyTipX : bodyBackX) - 0.6f * scale;
-	float bodyMaxX = (bodyTipX > bodyBackX ? bodyTipX : bodyBackX) + 0.6f * scale;
-	float bodyMinY = (bodyTipY < bodyBackY ? bodyTipY : bodyBackY) - 0.8f * scale;
-	float bodyMaxY = (bodyTipY > bodyBackY ? bodyTipY : bodyBackY) + 1.0f * scale;
-	partAbsoluteBox_[BODY]->setDimensions(bodyMinX, bodyMaxX, bodyMinY, bodyMaxY);
-
-	// Left wing bounding box with rotation and scale
-	float leftWingX = cx + (-0.7f * cosA - (-1.0f) * sinA) * scale;
-	float leftWingY = cy + (-0.7f * sinA + (-1.0f) * cosA) * scale;
-	float leftWingMinX = leftWingX - 0.3f * scale;
-	float leftWingMaxX = leftWingX + 0.3f * scale;
-	float leftWingMinY = leftWingY - 0.4f * scale;
-	float leftWingMaxY = leftWingY + 0.4f * scale;
-	partAbsoluteBox_[BOTTOM_WING]->setDimensions(leftWingMinX, leftWingMaxX, leftWingMinY, leftWingMaxY);
-
-	// Right wing bounding box with rotation and scale
-	float rightWingX = cx + (0.7f * cosA - (-1.0f) * sinA) * scale;
-	float rightWingY = cy + (0.7f * sinA + (-1.0f) * cosA) * scale;
-	float rightWingMinX = rightWingX - 0.3f * scale;
-	float rightWingMaxX = rightWingX + 0.3f * scale;
-	float rightWingMinY = rightWingY - 0.4f * scale;
-	float rightWingMaxY = rightWingY + 0.4f * scale;
-	partAbsoluteBox_[TOP_WING]->setDimensions(rightWingMinX, rightWingMaxX, rightWingMinY, rightWingMaxY);
-
-	// Engine bounding box with rotation and scale
-	float engineX = cx + (0.0f * cosA - (-0.9f) * sinA) * scale;
-	float engineY = cy + (0.0f * sinA + (-0.9f) * cosA) * scale;
-	float engineMinX = engineX - 0.2f * scale;
-	float engineMaxX = engineX + 0.2f * scale;
-	float engineMinY = engineY - 0.2f * scale;
-	float engineMaxY = engineY + 0.2f * scale;
-	partAbsoluteBox_[ENGINE]->setDimensions(engineMinX, engineMaxX, engineMinY, engineMaxY);
-
-	// Initialize global bounding box based on the body
-	float globalMinX = bodyMinX;
-	float globalMaxX = bodyMaxX;
-	float globalMinY = bodyMinY;
-	float globalMaxY = bodyMaxY;
-
-	// Update global bounding box based on all parts
-	if (leftWingMinX < globalMinX) globalMinX = leftWingMinX;
-	if (rightWingMinX < globalMinX) globalMinX = rightWingMinX;
-	if (engineMinX < globalMinX) globalMinX = engineMinX;
-
-	if (leftWingMaxX > globalMaxX) globalMaxX = leftWingMaxX;
-	if (rightWingMaxX > globalMaxX) globalMaxX = rightWingMaxX;
-	if (engineMaxX > globalMaxX) globalMaxX = engineMaxX;
-
-	if (leftWingMinY < globalMinY) globalMinY = leftWingMinY;
-	if (rightWingMinY < globalMinY) globalMinY = rightWingMinY;
-	if (engineMinY < globalMinY) globalMinY = engineMinY;
-
-	if (leftWingMaxY > globalMaxY) globalMaxY = leftWingMaxY;
-	if (rightWingMaxY > globalMaxY) globalMaxY = rightWingMaxY;
-	if (engineMaxY > globalMaxY) globalMaxY = engineMaxY;
-
-	// Set the global bounding box
-	setAbsoluteBoundingBox(globalMinX, globalMaxX, globalMinY, globalMaxY);
+	// Set the global bounding box for the spaceship
+	setAbsoluteBoundingBox(minX, maxX, minY, maxY);
 }
 
 
