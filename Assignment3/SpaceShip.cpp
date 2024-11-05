@@ -186,6 +186,7 @@ UpdateStatus SpaceShip::update(float dt)
 	// Update the spaceship's angle based on angular velocity
 	setAngle(getAngle() + angularVelocity_ * dt);
 
+	std::cout << health_ << std::endl;
 	// Apply thrust if active
 	if (thrustActive_) {
 		float angleRad = M_PI * getAngle() / 180.0f;  // Convert angle to radians

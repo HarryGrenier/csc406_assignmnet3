@@ -665,19 +665,36 @@ void mySpecialKeyUpHandler(int key, int x, int y)
 	}
 }
 
-
+// generate astroids in the world
 void generateRandomAsteroid() {
-	// Generate random properties for the asteroid
-	float x = xDist(myEngine);
-	float y = yDist(myEngine);
-	float angle = angleDist(myEngine);
-	float direction = angleDist(myEngine);
-	float speed = speedDist(myEngine);
-	float spin = spinDist(myEngine);
-	float r = colorDist(myEngine);
-	float g = colorDist(myEngine);
-	float b = colorDist(myEngine);
-	float size = sizeDist(myEngine);
+	// Define the minimum distance from the spaceship to spawn an asteroid
+	const float minSpawnDistance = 3.0f; // Adjust as needed based on spaceship size
+
+	float x, y, angle, direction, speed, spin, r, g, b, size;
+	bool validPosition = false;
+
+	// Repeat until a valid position is found
+	while (!validPosition) {
+		// Generate random properties for the asteroid
+		x = xDist(myEngine);
+		y = yDist(myEngine);
+		angle = angleDist(myEngine);
+		direction = angleDist(myEngine);
+		speed = speedDist(myEngine);
+		spin = spinDist(myEngine);
+		r = colorDist(myEngine);
+		g = colorDist(myEngine);
+		b = colorDist(myEngine);
+		size = sizeDist(myEngine);
+
+		// Calculate the distance from the spaceship
+		float dx = x - spaceship->getX();
+		float dy = y - spaceship->getY();
+		float distance = sqrt(dx * dx + dy * dy);
+
+		// Check if the distance is greater than the minimum spawn distance
+		validPosition = (distance >= minSpawnDistance);
+	}
 
 	// Choose random shape for the asteroid
 	switch (shapeDist(myEngine)) {
@@ -705,6 +722,7 @@ void generateRandomAsteroid() {
 		break;
 	}
 }
+
 
 
 
